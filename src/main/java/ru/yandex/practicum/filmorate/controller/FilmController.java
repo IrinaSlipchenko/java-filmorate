@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -32,7 +31,7 @@ public class FilmController {
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
         log.info("create");
-        if(film.getReleaseDate().isBefore(EARLIEST_DATE)){
+        if (film.getReleaseDate().isBefore(EARLIEST_DATE)) {
             throw new ValidationException("Wrong date");
         }
         film.setId(nextID());
@@ -41,23 +40,18 @@ public class FilmController {
     }
 
     @PutMapping
-    public Film update(@Valid @RequestBody Film film){
-        if(films.containsKey(film.getId())){
-            if(film.getReleaseDate().isBefore(EARLIEST_DATE)){
+    public Film update(@Valid @RequestBody Film film) {
+        if (films.containsKey(film.getId())) {
+            if (film.getReleaseDate().isBefore(EARLIEST_DATE)) {
                 throw new ValidationException("Wrong date");
             }
             films.put(film.getId(), film);
             return film;
         }
-        throw new ValidationException("Film not exist");
+        throw new RuntimeException("Film not exist");
     }
 
-
-
-    private long nextID(){
+    private long nextID() {
         return ++id;
     }
-
-    // добавить обновление фильма;
-
 }

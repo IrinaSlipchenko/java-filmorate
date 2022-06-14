@@ -6,7 +6,10 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.Valid;
 import javax.validation.ValidationException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
@@ -25,16 +28,17 @@ public class UserController {
     public User create(@Valid @RequestBody User user) {
         user.setId(nextID());
 
-        if("".equals(user.getName()) || user.getName() == null){
+        if ("".equals(user.getName()) || user.getName() == null) {
             user.setName(user.getLogin());
         }
         users.put(user.getId(), user);
         return user;
     }
+
     @PutMapping
-    public User update(@Valid @RequestBody User user){
-        if(users.containsKey(user.getId())){
-            if("".equals(user.getName()) || user.getName() == null){
+    public User update(@Valid @RequestBody User user) {
+        if (users.containsKey(user.getId())) {
+            if ("".equals(user.getName()) || user.getName() == null) {
                 user.setName(user.getLogin());
             }
             users.put(user.getId(), user);
@@ -43,9 +47,7 @@ public class UserController {
         throw new ValidationException("User not exist");
     }
 
-    private long nextID(){
+    private long nextID() {
         return ++id;
     }
-
-    // добавить обновление фильма;
 }
