@@ -30,7 +30,7 @@ public class FilmController {
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
-        log.info("create");
+        log.info("create film write it to the log");
         if (film.getReleaseDate().isBefore(EARLIEST_DATE)) {
             throw new ValidationException("Wrong date");
         }
@@ -41,6 +41,7 @@ public class FilmController {
 
     @PutMapping
     public Film update(@Valid @RequestBody Film film) {
+        log.info("update film write it to the log");
         if (films.containsKey(film.getId())) {
             if (film.getReleaseDate().isBefore(EARLIEST_DATE)) {
                 throw new ValidationException("Wrong date");

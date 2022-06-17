@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -13,8 +15,8 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
-@Slf4j
 public class UserController {
+    private final static Logger log = LoggerFactory.getLogger(UserController.class);
     private Map<Long, User> users = new HashMap<>();
 
     private long id;
@@ -27,7 +29,7 @@ public class UserController {
     @PostMapping
     public User create(@Valid @RequestBody User user) {
         user.setId(nextID());
-
+        log.info("create user write log");
         if ("".equals(user.getName()) || user.getName() == null) {
             user.setName(user.getLogin());
         }
@@ -37,6 +39,7 @@ public class UserController {
 
     @PutMapping
     public User update(@Valid @RequestBody User user) {
+        log.info("update user write log");
         if (users.containsKey(user.getId())) {
             if ("".equals(user.getName()) || user.getName() == null) {
                 user.setName(user.getLogin());

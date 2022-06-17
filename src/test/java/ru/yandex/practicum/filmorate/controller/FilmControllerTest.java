@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -23,11 +22,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class FilmControllerTest {
 
-
     @Autowired
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
+
     @Test
     void findAll() throws Exception {
         mockMvc.perform(get("/films")).andExpect(status().isOk());
@@ -76,8 +75,8 @@ class FilmControllerTest {
                 Arguments.of(
                         "Wrong date",
                         Film.builder()
-                                .name("qqqqqqqqqqqqq")
-                                .description("Тест описание")
+                                .name("The Bourne Identity")
+                                .description("Мировая премьера картины состоялась в Лос-Анджелесе.")
                                 .releaseDate(LocalDate.of(1800, 10, 17))
                                 .duration(120)
                                 .build()
