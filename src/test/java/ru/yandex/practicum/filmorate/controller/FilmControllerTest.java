@@ -47,20 +47,30 @@ class FilmControllerTest {
     }
 
     @Test
-    void update() {
+    void update() throws Exception {
+        Film film = Film.builder()
+                .id(1)
+                .name("Прогулка")
+                .description("Канатаходец задумал пройти между башнями-близнецами")
+                .releaseDate(LocalDate.of(2009, 11, 15))
+                .duration(100)
+                .build();
+        String json = objectMapper.writeValueAsString(film);
+        mockMvc.perform(put("/films").content(json).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
 
     }
 
     @MethodSource("invalidFilmSourse")
     @ParameterizedTest(name = "{0}")
-    void test_invalidFilmShouldBadReq(String name, Film film) throws Exception{
+    void test_invalidFilmShouldBadReq(String name, Film film) throws Exception {
         String json = objectMapper.writeValueAsString(film);
         mockMvc.perform(post("/films").content(json).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
 
     }
 
-    private static Stream<Arguments> invalidFilmSourse(){
+    private static Stream<Arguments> invalidFilmSourse() {
         return Stream.of(
                 Arguments.of(
                         "Empty name",
