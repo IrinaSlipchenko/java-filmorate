@@ -49,7 +49,7 @@ class FilmControllerTest {
     @Test
     void update() throws Exception {
         Film film = Film.builder()
-                .id(1)
+                .id(1L)
                 .name("Прогулка")
                 .description("Канатаходец задумал пройти между башнями-близнецами")
                 .releaseDate(LocalDate.of(2009, 11, 15))

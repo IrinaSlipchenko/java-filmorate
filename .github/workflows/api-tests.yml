@@ -17,6 +17,8 @@ jobs:
         with:
           java-version: '11'
           distribution: 'temurin'
+          cache: maven
+
 
       - name: Install Node
         uses: actions/setup-node@v1
@@ -43,7 +45,7 @@ jobs:
         run: nohup mvn spring-boot:run &
 
       - name: Waiting for application is up
-        run: /tmp/wait-for-it.sh -t 120 localhost:8080 -- echo "application is up"
+        run: /tmp/wait-for-it.sh -t 60 localhost:8080 -- echo "application is up"
 
       - name: Run POSTMAN tests
         run: |
