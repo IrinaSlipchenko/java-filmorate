@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.service.UserValidator;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -14,10 +15,12 @@ import java.util.List;
 @Slf4j
 public class UserController {
     private final UserService userService;
+    private final UserValidator userValidator;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, UserValidator userValidator) {
         this.userService = userService;
+        this.userValidator = userValidator;
     }
 
     @GetMapping
@@ -33,17 +36,17 @@ public class UserController {
     @PostMapping
     public User create(@Valid @RequestBody User user) {
         log.info("create user write log");
-        return userService.create(user);
+        return userService.create(userValidator.validateAndChange(user));
     }
 
     @PutMapping
     public User update(@Valid @RequestBody User user) {
         log.info("update user write log");
-        return userService.update(user);
+        return userService.update(userValidator.validateAndChange(user));
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    public User friendAdd(@PathVariable Long id, @PathVariable Long friendId){
+    public User friendAdd(@PathVariable Long id, @PathVariable Long friendId) {
         return userService.friendAdd(id, friendId);
     }
 

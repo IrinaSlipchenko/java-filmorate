@@ -4,13 +4,10 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
-public class InMemoryUserStorage implements UserStorage{
+public class InMemoryUserStorage implements UserStorage {
     private final Map<Long, User> users = new HashMap<>();
 
     private long id;
@@ -21,18 +18,12 @@ public class InMemoryUserStorage implements UserStorage{
 
     public User create(User user) {
         user.setId(nextID());
-        if ("".equals(user.getName()) || user.getName() == null) {
-            user.setName(user.getLogin());
-        }
         users.put(user.getId(), user);
         return user;
     }
 
-    public User update(User user){
+    public User update(User user) {
         if (users.containsKey(user.getId())) {
-            if ("".equals(user.getName()) || user.getName() == null) {
-                user.setName(user.getLogin());
-            }
             users.put(user.getId(), user);
             return user;
         }
@@ -41,7 +32,7 @@ public class InMemoryUserStorage implements UserStorage{
 
     public User findUserById(Long userId) {
         return users.values().stream()
-                .filter(u -> u.getId() == userId)
+                .filter(u -> Objects.equals(u.getId(), userId))
                 .findFirst()
                 .orElseThrow(() -> new UserNotFoundException(String.format("%d User not exist", userId)));
     }

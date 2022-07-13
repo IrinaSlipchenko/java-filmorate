@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.FilmValidator;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
@@ -15,10 +16,12 @@ import java.util.List;
 @Slf4j
 public class FilmController {
     private final FilmService filmService;
+    private final FilmValidator filmValidator;
 
     @Autowired
-    public FilmController(FilmService filmService) {
+    public FilmController(FilmService filmService, FilmValidator filmValidator) {
         this.filmService = filmService;
+        this.filmValidator = filmValidator;
     }
 
     @GetMapping
@@ -27,29 +30,29 @@ public class FilmController {
     }
 
     @GetMapping("/{filmID}")
-    public Film findFilm(@PathVariable("filmID") Long filmID){
+    public Film findFilm(@PathVariable("filmID") Long filmID) {
         return filmService.findFilmById(filmID);
     }
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
         log.info("create film write it to the log");
-        return filmService.create(film);
+        return filmService.create(filmValidator.validateAndChange(film));
     }
 
     @PutMapping
     public Film update(@Valid @RequestBody Film film) {
         log.info("update film write it to the log");
-        return filmService.update(film);
+        return filmService.update(filmValidator.validateAndChange(film));
     }
 
     @PutMapping("/{id}/like/{userId}")
-    public Film likeFilm(@PathVariable Long id, @PathVariable Long userId){
+    public Film likeFilm(@PathVariable Long id, @PathVariable Long userId) {
         return filmService.likeFilm(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    public Film deleteLikeFilm(@PathVariable Long id, @PathVariable Long userId){
+    public Film deleteLikeFilm(@PathVariable Long id, @PathVariable Long userId) {
         return filmService.deleteLikeFilm(id, userId);
     }
 
