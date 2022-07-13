@@ -13,7 +13,7 @@ import java.util.Set;
 @Data
 @Builder
 public class Film {
-    private long id;
+    private Long id;
     @NotBlank
     private String name;
     @Size(max = 200)
@@ -21,5 +21,5 @@ public class Film {
     private LocalDate releaseDate;
     @Positive
     private Integer duration;
-    private Set<Long> likes = new HashSet<>();
+    public Set<Long> likes;
 }

@@ -39,7 +39,12 @@ public class InMemoryUserStorage implements UserStorage{
         throw new UserNotFoundException("User not exist");
     }
 
-
+    public User findUserById(Long userId) {
+        return users.values().stream()
+                .filter(u -> u.getId() == userId)
+                .findFirst()
+                .orElseThrow(() -> new UserNotFoundException(String.format("%d User not exist", userId)));
+    }
 
     private long nextID() {
         return ++id;
