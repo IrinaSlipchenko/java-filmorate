@@ -1,57 +1,71 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.FilmValidator;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
+import javax.validation.constraints.Positive;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/films")
 @Slf4j
 public class FilmController {
-    private final static LocalDate EARLIEST_DATE = LocalDate.of(1895, 12, 28);
+    private final FilmService filmService;
+    private final FilmValidator filmValidator;
 
-    private Map<Long, Film> films = new HashMap<>();
-
-    private long id;
+    @Autowired
+    public FilmController(FilmService filmService, FilmValidator filmValidator) {
+        this.filmService = filmService;
+        this.filmValidator = filmValidator;
+    }
 
     @GetMapping
     public List<Film> findAll() {
-        return new ArrayList<>(films.values());
+        return filmService.findAll();
+    }
+
+    @GetMapping("/{filmID}")
+    public Film findFilm(@PathVariable("filmID") Long filmID) {
+        return filmService.findFilmById(filmID);
     }
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
         log.info("create film write it to the log");
-        if (film.getReleaseDate().isBefore(EARLIEST_DATE)) {
-            throw new ValidationException("Wrong date");
-        }
-        film.setId(nextID());
-        films.put(film.getId(), film);
-        return film;
+        return filmService.create(filmValidator.validateAndChange(film));
     }
 
     @PutMapping
     public Film update(@Valid @RequestBody Film film) {
         log.info("update film write it to the log");
-        if (films.containsKey(film.getId())) {
-            if (film.getReleaseDate().isBefore(EARLIEST_DATE)) {
-                throw new ValidationException("Wrong date");
-            }
-            films.put(film.getId(), film);
-            return film;
-        }
-        throw new RuntimeException("Film not exist");
+        return filmService.update(filmValidator.validateAndChange(film));
     }
 
-    private long nextID() {
-        return ++id;
+    @DeleteMapping("/{id}")
+    public Film deleteFilmById(@PathVariable Long id) {
+        log.info("delete film write it to the log");
+        return filmService.deleteFilmById(id);
     }
+
+    @PutMapping("/{id}/like/{userId}")
+    public Film likeFilm(@PathVariable Long id, @PathVariable Long userId) {
+        return filmService.likeFilm(id, userId);
+    }
+
+    @DeleteMapping("/{id}/like/{userId}")
+    public Film deleteLikeFilm(@PathVariable Long id, @PathVariable Long userId) {
+        return filmService.deleteLikeFilm(id, userId);
+    }
+
+    @GetMapping("/popular")
+    public List<Film> getPopularFilms(@RequestParam(value = "count", defaultValue = "10") @Positive int count) {
+        return filmService.getPopularFilms(count);
+    }
+
+
 }

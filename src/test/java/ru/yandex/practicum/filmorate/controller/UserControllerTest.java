@@ -44,7 +44,7 @@ class UserControllerTest {
     @Test
     void update() throws Exception {
         User user = User.builder()
-                .id(1)
+                .id(1L)
                 .name("Нина")
                 .birthday(LocalDate.of(1990, 5, 9))
                 .login("Nina")
