@@ -23,18 +23,29 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     public User update(User user) {
-        if (users.containsKey(user.getId())) {
-            users.put(user.getId(), user);
+        Long userId = user.getId();
+        if (users.containsKey(userId)) {
+            users.put(userId, user);
             return user;
         }
-        throw new UserNotFoundException("User not exist");
+        throw new UserNotFoundException(userId + " id - User not exist");
     }
 
     public User findUserById(Long userId) {
-        return users.values().stream()
-                .filter(u -> Objects.equals(u.getId(), userId))
-                .findFirst()
-                .orElseThrow(() -> new UserNotFoundException(String.format("%d User not exist", userId)));
+        if (users.containsKey(userId)) {
+            return users.get(userId);
+        }
+        throw new UserNotFoundException(userId + " id - User not exist");
+    }
+
+    @Override
+    public User delete(Long userId) {
+        if (users.containsKey(userId)) {
+            User user = users.get(userId);
+            users.remove(userId);
+            return user;
+        }
+        throw new UserNotFoundException(userId + " id - User not exist");
     }
 
     private long nextID() {

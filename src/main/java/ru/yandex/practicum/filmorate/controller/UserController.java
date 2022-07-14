@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.service.UserValidator;
@@ -43,6 +44,12 @@ public class UserController {
     public User update(@Valid @RequestBody User user) {
         log.info("update user write log");
         return userService.update(userValidator.validateAndChange(user));
+    }
+
+    @DeleteMapping("/{id}")
+    public User deleteUserById(@PathVariable Long id) {
+        log.info("delete user id - " + id + " write it to the log");
+        return userService.deleteUserById(id);
     }
 
     @PutMapping("/{id}/friends/{friendId}")

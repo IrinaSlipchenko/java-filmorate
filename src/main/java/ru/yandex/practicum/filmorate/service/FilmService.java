@@ -37,6 +37,10 @@ public class FilmService {
         return filmStorage.findFilmById(filmID);
     }
 
+    public Film deleteFilmById(Long filmID) {
+        return filmStorage.delete(filmID);
+    }
+
     public Film likeFilm(Long filmID, Long userID) {
         Film film = filmStorage.findFilmById(filmID);
         User user = userStorage.findUserById(userID);
@@ -57,4 +61,5 @@ public class FilmService {
                 .limit(count)
                 .collect(Collectors.toList());
     }
+
 }

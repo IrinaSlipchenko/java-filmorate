@@ -46,6 +46,12 @@ public class FilmController {
         return filmService.update(filmValidator.validateAndChange(film));
     }
 
+    @DeleteMapping("/{id}")
+    public Film deleteFilmById(@PathVariable Long id) {
+        log.info("delete film write it to the log");
+        return filmService.deleteFilmById(id);
+    }
+
     @PutMapping("/{id}/like/{userId}")
     public Film likeFilm(@PathVariable Long id, @PathVariable Long userId) {
         return filmService.likeFilm(id, userId);

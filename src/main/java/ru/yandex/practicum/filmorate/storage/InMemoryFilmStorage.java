@@ -27,21 +27,31 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film update(Film film) {
-        if (films.containsKey(film.getId())) {
-            films.put(film.getId(), film);
+        Long filmId = film.getId();
+        if (films.containsKey(filmId)) {
+            films.put(filmId, film);
             return film;
         }
-        throw new FilmNotFoundException("Film not exist");
+        throw new FilmNotFoundException(filmId + " id - Film not exist");
     }
 
     @Override
     public Film findFilmById(Long filmId) {
-        return films.values().stream()
-                .filter(f -> Objects.equals(f.getId(), filmId))
-                .findFirst()
-                .orElseThrow(() -> new FilmNotFoundException(String.format("%d Film not exist", filmId)));
+        if (films.containsKey(filmId)) {
+            return films.get(filmId);
+        }
+        throw new FilmNotFoundException(filmId + " id - Film not exist");
     }
 
+    @Override
+    public Film delete(Long filmId) {
+        if (films.containsKey(filmId)) {
+            Film film = films.get(filmId);
+            films.remove(filmId);
+            return film;
+        }
+        throw new FilmNotFoundException(filmId + " id - Film not exist");
+    }
 
     private long nextID() {
         return ++id;
