@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class RatingMPA {
-    private int ratingId;
-    private String ratingName;
-    private String ratingDescription;
+    private int id;
+    private String name;
+    private String description;
 }

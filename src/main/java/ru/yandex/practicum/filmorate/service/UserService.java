@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class UserService {
     private final UserStorage userStorage;
@@ -45,36 +47,32 @@ public class UserService {
 
     public User friendAdd(Long id, Long friendId) {
         User user = userStorage.findUserById(id);
-        User myFriend = userStorage.findUserById(friendId);
+        userStorage.findUserById(friendId); // validate friend
 
         user.getFriends().add(friendId);
-        myFriend.getFriends().add(id);
-
+        userStorage.update(user);
         return user;
     }
 
     public User friendDelete(Long id, Long friendId) {
         User user = userStorage.findUserById(id);
-        User myFriend = userStorage.findUserById(friendId);
+        userStorage.findUserById(friendId); // validate friend
 
         user.getFriends().remove(friendId);
-        myFriend.getFriends().remove(id);
+        userStorage.update(user);
 
         return user;
     }
 
     public List<User> allMyFriends(Long id) {
-        return userStorage.findAll().stream()
-                .filter(user -> user.getFriends().contains(id))
+        return userStorage.findUserById(id).getFriends().stream()
+                .map(userStorage::findUserById)
                 .collect(Collectors.toList());
     }
 
     public List<User> commonFriends(Long id, Long otherId) {
-        List<User> myFriends = userStorage.findAll().stream()
-                .filter(user -> user.getFriends().contains(id)).collect(Collectors.toList());
-
-        List<User> otherFriends = userStorage.findAll().stream()
-                .filter(user -> user.getFriends().contains(otherId)).collect(Collectors.toList());
+        List<User> myFriends = allMyFriends(id);
+        List<User> otherFriends = allMyFriends(otherId);
 
         return myFriends.stream().filter(otherFriends::contains).collect(Collectors.toList());
     }

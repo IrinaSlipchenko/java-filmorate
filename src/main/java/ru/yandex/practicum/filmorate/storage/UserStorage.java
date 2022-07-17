@@ -1,9 +1,7 @@
 package ru.yandex.practicum.filmorate.storage;
 
-import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.model.User;
 
-import javax.validation.Valid;
 import java.util.List;
 
 public interface UserStorage {
@@ -15,6 +13,5 @@ public interface UserStorage {
 
     User findUserById(Long userId);
 
-    User delete (Long userId);
-
+    User delete(Long userId);
 }
