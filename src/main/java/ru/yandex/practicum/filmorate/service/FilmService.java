@@ -33,7 +33,7 @@ public class FilmService {
     }
 
     public Film deleteFilmById(Long filmID) {
-        return filmStorage.delete(filmID);
+        return filmStorage.deleteFilmById(filmID);
     }
 
     public Film likeFilm(Long filmID, Long userID) {

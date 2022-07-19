@@ -36,7 +36,7 @@ public class UserService {
         for (Long id : myFriends) {
             userStorage.findUserById(id).getFriends().remove(userID);
         }
-        return userStorage.delete(userID);
+        return userStorage.deleteUserById(userID);
     }
 
     public User friendAdd(Long id, Long friendId) {

@@ -84,9 +84,9 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Film delete(Long filmId) {
+    public Film deleteFilmById(Long filmId) {
         Film film = findFilmById(filmId);
-        String sql = "DELETE FROM films WHERE film_id=?";
+        String sql = "DELETE CASCADE FROM films WHERE film_id=?";
         jdbcTemplate.update(sql, filmId);
         return film;
     }

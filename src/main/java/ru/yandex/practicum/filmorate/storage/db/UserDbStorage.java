@@ -73,9 +73,9 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public User delete(Long userId) {
+    public User deleteUserById(Long userId) {
         User user = findUserById(userId);
-        String sql = "DELETE FROM users WHERE user_id=?";
+        String sql = "DELETE CASCADE FROM users WHERE user_id=?";
         jdbcTemplate.update(sql, userId);
         return user;
     }
