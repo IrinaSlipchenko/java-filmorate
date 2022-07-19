@@ -17,6 +17,7 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Primary
 @Component
@@ -88,6 +89,19 @@ public class FilmDbStorage implements FilmStorage {
         String sql = "DELETE FROM films WHERE film_id=?";
         jdbcTemplate.update(sql, filmId);
         return film;
+    }
+
+    @Override
+    public List<Film> getPopularFilms(int count) {
+        final String sql = "SELECT F.FILM_ID, count(USER_ID) LIKES\n" +
+                "FROM FILM_LIKES FL\n" +
+                "RIGHT JOIN FILMS F on FL.FILM_ID = F.FILM_ID\n" +
+                "GROUP BY F.FILM_ID\n" +
+                "ORDER BY LIKES DESC\n" +
+                "LIMIT ?";
+
+        List<Long> idList = jdbcTemplate.query(sql, (rs, i) -> rs.getLong("film_id"), count);
+        return idList.stream().map(this::findFilmById).collect(Collectors.toList());
     }
 
     private Film mapRowToFilm(ResultSet rs, int i) throws SQLException {
