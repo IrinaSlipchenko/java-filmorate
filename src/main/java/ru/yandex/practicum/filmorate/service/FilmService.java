@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
@@ -8,18 +8,13 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class FilmService {
+
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
-
-    @Autowired
-    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
-        this.filmStorage = filmStorage;
-        this.userStorage = userStorage;
-    }
 
     public List<Film> findAll() {
         return filmStorage.findAll();
@@ -45,6 +40,7 @@ public class FilmService {
         Film film = filmStorage.findFilmById(filmID);
         User user = userStorage.findUserById(userID);
         film.getLikes().add(user.getId());
+        filmStorage.update(film);
         return film;
     }
 
@@ -52,14 +48,11 @@ public class FilmService {
         Film film = filmStorage.findFilmById(id);
         User user = userStorage.findUserById(userId);
         film.getLikes().remove(user.getId());
+        filmStorage.update(film);
         return film;
     }
 
     public List<Film> getPopularFilms(int count) {
-        return filmStorage.findAll().stream()
-                .sorted((o1, o2) -> o2.getLikes().size() - o1.getLikes().size())
-                .limit(count)
-                .collect(Collectors.toList());
+        return filmStorage.getPopularFilms(count);
     }
-
 }

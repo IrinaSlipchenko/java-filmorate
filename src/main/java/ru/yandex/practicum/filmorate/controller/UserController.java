@@ -1,9 +1,8 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.service.UserValidator;
@@ -11,27 +10,22 @@ import ru.yandex.practicum.filmorate.service.UserValidator;
 import javax.validation.Valid;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/users")
-@Slf4j
+@RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
     private final UserValidator userValidator;
-
-    @Autowired
-    public UserController(UserService userService, UserValidator userValidator) {
-        this.userService = userService;
-        this.userValidator = userValidator;
-    }
 
     @GetMapping
     public List<User> findAll() {
         return userService.findAll();
     }
 
-    @GetMapping("/{userId}")
-    public User findUser(@PathVariable("userId") Long userId) {
-        return userService.findUserById(userId);
+    @GetMapping("/{id}")
+    public User findUser(@PathVariable("id") Long id) {
+        return userService.findUserById(id);
     }
 
     @PostMapping
