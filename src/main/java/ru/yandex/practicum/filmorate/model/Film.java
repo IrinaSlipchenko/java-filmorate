@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 
@@ -23,6 +22,5 @@ public class Film {
     private Integer duration;
     private Set<Long> likes;
     private Set<Genre> genres;
-    @JsonProperty("mpa")
-    private RatingMPA ratingMPA;
+    private Mpa mpa;
 }

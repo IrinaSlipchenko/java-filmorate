@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.dao;
+package ru.yandex.practicum.filmorate.storage.db;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -23,8 +23,8 @@ public class GenreDbStorage {
 
     private Genre mapRowToGenre(ResultSet rs, int i) throws SQLException {
         return Genre.builder()
-                .genreId(rs.getInt("genre_id"))
-                .genreName(rs.getString("genre_name"))
+                .id(rs.getInt("genre_id"))
+                .name(rs.getString("genre_name"))
                 .build();
     }
 

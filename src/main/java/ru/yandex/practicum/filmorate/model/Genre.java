@@ -8,8 +8,7 @@ import lombok.Data;
 @Builder
 
 public class Genre {
-    @JsonProperty("id")
-    private int genreId;
-    @JsonProperty("name")
-    private String genreName;
+    private int id;
+
+    private String name;
 }

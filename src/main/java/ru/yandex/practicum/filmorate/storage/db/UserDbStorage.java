@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.dao;
+package ru.yandex.practicum.filmorate.storage.db;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
@@ -18,13 +18,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
-@RequiredArgsConstructor  // Второй способ внедрить зависимости в конструктор
 @Component
-@Primary     //  Второй способ, использовать @Primary
-
+@Primary
+@RequiredArgsConstructor
 public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
+
+    private final FriendsStorage friendsStorage;
 
     @Override
     public List<User> findAll() {
@@ -56,16 +56,8 @@ public class UserDbStorage implements UserStorage {
                 "birthday=? WHERE user_id=?";
         jdbcTemplate.update(sql, user.getName(), user.getLogin(),
                 user.getEmail(), user.getBirthday(), user.getId());
-        updateFriends(user);
+        friendsStorage.updateFriends(user);
         return user;
-    }
-
-    private void updateFriends(User user) {
-
-        String sql = "DELETE FROM friends WHERE user_id=?";
-        String sql2 = "INSERT INTO friends (user_id, friend_id) VALUES(?,?)";
-        jdbcTemplate.update(sql, user.getId());
-        user.getFriends().forEach(fId -> jdbcTemplate.update(sql2, user.getId(), fId));
     }
 
     @Override
