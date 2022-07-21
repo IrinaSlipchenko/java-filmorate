@@ -87,7 +87,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getPopularFilms(int count, Integer genreId, Integer year) {
-        final String sql = "SELECT F.FILM_ID, count(DISTINCT USER_ID) LIKES\n" +
+        final String sql = "SELECT F.FILM_ID, count(USER_ID) LIKES\n" +
                 "FROM FILM_LIKES FL\n" +
                 "RIGHT JOIN FILMS F on FL.FILM_ID = F.FILM_ID\n" +
                 "WHERE (? is null OR EXISTS (SELECT 1 FROM FILM_GENRE FG WHERE FG.FILM_ID = F.FILM_ID AND FG.GENRE_ID = ?)) \n" +
