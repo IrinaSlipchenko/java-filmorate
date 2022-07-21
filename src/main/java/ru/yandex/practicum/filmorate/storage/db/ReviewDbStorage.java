@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.db;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -18,18 +18,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-
+@RequiredArgsConstructor
 public class ReviewDbStorage {
     private final JdbcTemplate jdbcTemplate;
     private final ReviewLikeDbStorage reviewLikeDbStorage;
     private final  FeedDbStorage feedDbStorage;
-
-    @Autowired
-    public ReviewDbStorage(JdbcTemplate jdbcTemplate, ReviewLikeDbStorage reviewLikeDbStorage, FeedDbStorage feedDbStorage) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.reviewLikeDbStorage = reviewLikeDbStorage;
-        this.feedDbStorage = feedDbStorage;
-    }
 
     public Review add(Review review){
         final String sqlUserHaveReviewFilm = "SELECT * FROM reviews WHERE film_id = ? AND user_id = ?";
