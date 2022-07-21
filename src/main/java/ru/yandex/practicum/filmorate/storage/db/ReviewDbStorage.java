@@ -39,11 +39,10 @@ public class ReviewDbStorage {
             stmt.setBoolean(2, review.getIsPositive());
             stmt.setLong(3,review.getUserId());
             stmt.setLong(4,review.getFilmId());
-            stmt.setLong(5, 0l);
+            stmt.setInt(5, 0);
             return stmt;
         }, keyHolder);
         review.setReviewId(keyHolder.getKey().longValue());
-        review.setUseful(reviewLikeDbStorage.getResultUseful(review.getReviewId()));
         feedDbStorage.add(Feed.builder()
                 .timestamp(LocalDateTime.now())
                 .userId(review.getUserId())
