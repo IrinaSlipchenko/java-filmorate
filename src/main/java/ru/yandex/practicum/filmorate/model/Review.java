@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
+import jdk.jfr.BooleanFlag;
 import lombok.Builder;
 import lombok.Data;
 
@@ -13,6 +14,7 @@ public class Review {
      @NotBlank(message = "Отсутсвует текст отзыва.")
      private String content;
      @NotNull(message = "Отсутствует тип отзыва : положительный или негативный.")
+     @BooleanFlag
      private Boolean isPositive;
      @NotNull(message = "Отсутсвует ID пользователя, создавший отзыв.")
      private Long userId;

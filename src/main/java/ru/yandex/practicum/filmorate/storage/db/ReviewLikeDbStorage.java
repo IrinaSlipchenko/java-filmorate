@@ -1,20 +1,15 @@
 package ru.yandex.practicum.filmorate.storage.db;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NoSuchReactFind;
 
 @Component
+@RequiredArgsConstructor
 public class ReviewLikeDbStorage {
     private final JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    public ReviewLikeDbStorage(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
 
     public Integer getResultUseful(Long reviewId){
         final Integer[] result = {0};
@@ -31,9 +26,9 @@ public class ReviewLikeDbStorage {
     }
 
     public Boolean deleteReaction (Long idReview, Long userId) {
-        if(!containsReaction(idReview, userId, true) || !(containsReaction(idReview, userId, false))){
+        if(!containsReaction(idReview, userId, true) && !containsReaction(idReview, userId, false)){
             throw new NoSuchReactFind( "Пользователь c ID = " + userId
-                    + "не оставлял реакции на отзыв с ID = " + idReview );
+                    + " не оставлял реакции на отзыв с ID = " + idReview );
         }
         final String sql = "DELETE FROM review_like WHERE review_id =? AND user_id = ?";
         return jdbcTemplate.update(sql,idReview,userId) > 0;
@@ -42,15 +37,15 @@ public class ReviewLikeDbStorage {
     public Boolean deleteDislikeReaction(Long idReview, Long userId) {
         if(!containsReaction(idReview, userId, false)) {
             throw new NoSuchReactFind( "Пользователь c ID = " + userId
-                    + "не оставлял  отрицательной реакции на отзыв с ID = " + idReview );
+                    + " не оставлял  отрицательной реакции на отзыв с ID = " + idReview );
         }
         final String sql = "DELETE FROM review_like WHERE review_id =? AND user_id = ? AND is_useful = ?";
         return jdbcTemplate.update(sql,idReview,userId,false) > 0;
     }
 
     public Boolean containsReaction (Long idReview, Long userId, Boolean is_useful) {
-        final String sql = "SELECT * FROM review_like WHERE review_id = ? AND user_id = ?";
-        return jdbcTemplate.update(sql,idReview,userId,is_useful) > 0;
+        final String sql = "SELECT * FROM review_like WHERE review_id = ? AND user_id = ? AND is_useful = ?";
+        return jdbcTemplate.queryForList(sql,idReview,userId,is_useful).size() > 0;
     }
 
 }

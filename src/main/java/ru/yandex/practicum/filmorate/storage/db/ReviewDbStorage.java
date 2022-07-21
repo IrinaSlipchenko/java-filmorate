@@ -1,11 +1,12 @@
 package ru.yandex.practicum.filmorate.storage.db;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exception.AlreadyExistException;
 import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.Review;
 
@@ -17,21 +18,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class ReviewDbStorage {
     private final JdbcTemplate jdbcTemplate;
     private final ReviewLikeDbStorage reviewLikeDbStorage;
     private final  FeedDbStorage feedDbStorage;
 
-    @Autowired
-    public ReviewDbStorage(JdbcTemplate jdbcTemplate
-            , ReviewLikeDbStorage reviewLikeDbStorage
-            , FeedDbStorage feedDbStorage) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.reviewLikeDbStorage = reviewLikeDbStorage;
-        this.feedDbStorage = feedDbStorage;
-    }
-
     public Review add(Review review){
+        final String sqlUserHaveReviewFilm = "SELECT * FROM reviews WHERE film_id = ? AND user_id = ?";
+        if( jdbcTemplate.queryForList(sqlUserHaveReviewFilm,review.getFilmId(),review.getUserId()).size() > 0){
+            throw new AlreadyExistException("Пользователь с ID = "
+                    + review.getUserId() + " уже оставлял отзыв на фильм ID = " + review.getFilmId());
+        }
         final String sql = "INSERT INTO reviews ( content, is_positive, user_id, film_id, useful )" +
                 " VALUES ( ? ,? ,? ,? ,? )";
         KeyHolder keyHolder = new GeneratedKeyHolder();

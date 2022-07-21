@@ -66,16 +66,16 @@ public class ReviewController {
 
 // пользователь удаляет лайк/дизлайк отзыву.
     @DeleteMapping("/{id}/like/{userId}")
-    public Boolean deleteDislike(@PathVariable Long id,
+    public Boolean deleteLike(@PathVariable Long id,
                               @PathVariable Long userId) {
-        return reviewService.deleteDislike(id, userId);
+        return reviewService.deleteLike(id, userId);
     }
 
-//- `DELETE /reviews/{id}/dislike/{userId}`  — пользователь удаляет дизлайк отзыву.
+//-  пользователь удаляет дизлайк отзыву.
     @DeleteMapping ("/{id}/dislike/{userId}")
-    public Boolean deleteLike(@PathVariable Long id,
+    public Boolean deleteDislike(@PathVariable Long id,
                             @PathVariable Long userId) {
-        return reviewService.deleteLike(id, userId);
+        return reviewService.deleteDislike(id, userId);
     }
 
 }

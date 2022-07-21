@@ -38,10 +38,10 @@ public class ReviewService {
 
     public Review update(Review review){
         if( review.getReviewId() == null ) return add(review);
-        review.setFilmId(reviewDbStorage.get(review.getReviewId()).getFilmId());
         if( !reviewDbStorage.containsIdReview(review.getReviewId()) ) {
             throw new NoSuchReviewIdException("Отзыв по ID = " + review.getReviewId() + " не найден");
         }
+        review.setFilmId(reviewDbStorage.get(review.getReviewId()).getFilmId());
         return reviewDbStorage.update(review);
     }
 
@@ -72,17 +72,33 @@ public class ReviewService {
     }
 
     public Boolean addLike(Long id, Long userId){
+        if(!reviewDbStorage.containsIdReview(id)){
+            throw  new NoSuchReviewIdException("Отзыв по ID = " + id + " не найден");
+        }
+        userDbStorage.findUserById(userId);
         return reviewDbStorage.addReaction(id,userId,true);
     }
 
     public Boolean addDislike(Long id, Long userId){
+        if(!reviewDbStorage.containsIdReview(id)){
+            throw  new NoSuchReviewIdException("Отзыв по ID = " + id + " не найден");
+        }
+        userDbStorage.findUserById(userId);
         return reviewDbStorage.addReaction(id,userId,false);
     }
 
     public Boolean deleteDislike(Long id, Long userId){
+        if(!reviewDbStorage.containsIdReview(id)){
+            throw  new NoSuchReviewIdException("Отзыв по ID = " + id + " не найден");
+        }
+        userDbStorage.findUserById(userId);
         return reviewDbStorage.deleteDislike(id,userId);
     }
     public Boolean deleteLike(Long id, Long userId){
+        if(!reviewDbStorage.containsIdReview(id)){
+            throw  new NoSuchReviewIdException("Отзыв по ID = " + id + " не найден");
+        }
+        userDbStorage.findUserById(userId);
         return reviewDbStorage.deleteLike(id,userId);
     }
 
