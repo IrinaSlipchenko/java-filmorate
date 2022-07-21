@@ -30,11 +30,8 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> findAll() {
-        String sql = "SELECT F.*, G.*, R.MPA_NAME, R.MPA_DESCRIPTION FROM FILMS F\n" +
-                "LEFT JOIN FILM_GENRE FG ON F.FILM_ID=FG.FILM_ID\n" +
-                "LEFT JOIN GENRES G ON FG.GENRE_ID=G.GENRE_ID\n" +
+        String sql = "SELECT F.*, R.MPA_NAME, R.MPA_DESCRIPTION FROM FILMS F\n" +
                 "LEFT JOIN RATING_MPA R ON F.RATING_MPA_ID=R.MPA_ID";
-
         return jdbcTemplate.query(sql, this::mapRowToFilm);
     }
 
@@ -101,6 +98,27 @@ public class FilmDbStorage implements FilmStorage {
 
         List<Long> idList = jdbcTemplate.query(sql, (rs, i) -> rs.getLong("film_id"), genreId, genreId, year, year, count);
         return idList.stream().map(this::findFilmById).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        final String sql = "SELECT F.FILM_ID, count(USER_ID) LIKES\n" +
+                "FROM FILM_LIKES FL\n" +
+                "RIGHT JOIN FILMS F on FL.FILM_ID = F.FILM_ID\n" +
+                "WHERE F.FILM_ID IN (" +
+                "SELECT FL2.FILM_ID FROM FILM_LIKES FL2 WHERE FL2.USER_ID = ? AND FL2.FILM_ID IN(" +
+                "SELECT FL3.FILM_ID FROM FILM_LIKES FL3 WHERE FL3.USER_ID = ?" +
+                ") GROUP BY FL2.FILM_ID" +
+                ") " +
+                "GROUP BY F.FILM_ID\n" +
+                "ORDER BY LIKES DESC";
+        System.out.println("userId: " + userId);
+        System.out.println("friendId: " + friendId);
+        List<Long> idList = jdbcTemplate.query(sql, (rs, i) -> rs.getLong("film_id"), userId, friendId);
+
+        List<Film> films = idList.stream().map(this::findFilmById).collect(Collectors.toList());
+
+        return films;
     }
 
     private Film mapRowToFilm(ResultSet rs, int i) throws SQLException {
