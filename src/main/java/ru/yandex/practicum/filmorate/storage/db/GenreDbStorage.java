@@ -21,7 +21,7 @@ public class GenreDbStorage {
         return jdbcTemplate.query(sql, this::mapRowToGenre);
     }
 
-    private Genre mapRowToGenre(ResultSet rs, int i) throws SQLException {
+     Genre mapRowToGenre(ResultSet rs, int i) throws SQLException {
         return Genre.builder()
                 .id(rs.getInt("genre_id"))
                 .name(rs.getString("genre_name"))

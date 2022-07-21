@@ -13,6 +13,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.List;
@@ -28,8 +29,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<User> findAll() {
-        String sql = "SELECT U.*, F.friend_id FROM USERS AS U\n" +
-                "LEFT JOIN FRIENDS F on U.USER_ID = F.USER_ID\n";
+        String sql = "SELECT * FROM USERS";
         return jdbcTemplate.query(sql, this::mapRowToUser);
     }
 
@@ -49,7 +49,6 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User update(User user) {
-
         findUserById(user.getId());
         String sql = "UPDATE users SET user_name =?," +
                 "login=?, email=?," +
@@ -80,7 +79,15 @@ public class UserDbStorage implements UserStorage {
         return user;
     }
 
+    @Override
+    public List<User> allMyFriends(Long id) {
+        final String sql = "select U.* from FRIENDS AS F " +
+                "inner join USERS AS U on F.FRIEND_ID= U.USER_ID where F.USER_ID = ?";
+        return jdbcTemplate.query(sql, this::mapRowToUser, id);
+    }
+
     private User mapRowToUser(ResultSet rs, int i) throws SQLException {
+        ResultSetMetaData rsmd = rs.getMetaData();
         Set<Long> fr = new HashSet<>();
         User user = User.builder()
                 .id(rs.getLong("user_id"))
@@ -89,13 +96,13 @@ public class UserDbStorage implements UserStorage {
                 .email(rs.getString("email"))
                 .birthday(rs.getDate("birthday").toLocalDate())
                 .build();
-        do {
-            if (rs.getLong("friend_id") == 0) {
-                break;
-            }
-            fr.add(rs.getLong("friend_id"));
-        } while (rs.next());
-
+        if (rsmd.getColumnCount() > 5) {
+            do {
+                if (rs.getLong("friend_id") != 0) {
+                    fr.add(rs.getLong("friend_id"));
+                }
+            } while (rs.next());
+        }
         user.setFriends(fr);
         return user;
     }

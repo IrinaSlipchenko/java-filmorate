@@ -40,6 +40,7 @@ public class UserService {
     }
 
     public User friendAdd(Long id, Long friendId) {
+
         User user = userStorage.findUserById(id);
         userStorage.findUserById(friendId); // validate friend
 
@@ -59,9 +60,7 @@ public class UserService {
     }
 
     public List<User> allMyFriends(Long id) {
-        return userStorage.findUserById(id).getFriends().stream()
-                .map(userStorage::findUserById)
-                .collect(Collectors.toList());
+        return userStorage.allMyFriends(id);
     }
 
     public List<User> commonFriends(Long id, Long otherId) {
