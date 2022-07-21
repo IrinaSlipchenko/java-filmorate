@@ -8,11 +8,14 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.HashSet;
+import java.util.Set;
+import java.util.TreeSet;
 
 @Component
 @RequiredArgsConstructor
 public class FilmGenreDbStorage {
 
+    private final GenreDbStorage genreDbStorage;
     private final JdbcTemplate jdbcTemplate;
 
     public void updateGenres(Film film) {
@@ -25,5 +28,11 @@ public class FilmGenreDbStorage {
         film.getGenres().stream()
                 .map(Genre::getId)
                 .forEach(id -> jdbcTemplate.update(sql2, film.getId(), id));
+    }
+
+    public Set<Genre> getGenresByFilmId(Long id) {
+        String sql = "SELECT GENRES.* FROM FILM_GENRE " +
+                "LEFT JOIN GENRES ON FILM_GENRE.GENRE_ID = GENRES.GENRE_ID WHERE film_id=?";
+        return new TreeSet<>(jdbcTemplate.query(sql, genreDbStorage::mapRowToGenre, id));
     }
 }

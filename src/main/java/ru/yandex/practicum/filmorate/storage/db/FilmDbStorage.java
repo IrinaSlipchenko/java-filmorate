@@ -10,13 +10,12 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Primary
@@ -71,9 +70,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film findFilmById(Long filmId) {
-        String sql = "SELECT F.*, G.*, R.MPA_NAME, R.MPA_DESCRIPTION FROM FILMS F\n" +
-                "LEFT JOIN FILM_GENRE FG ON F.FILM_ID=FG.FILM_ID\n" +
-                "LEFT JOIN GENRES G ON FG.GENRE_ID=G.GENRE_ID\n" +
+        String sql = "SELECT F.*, R.MPA_NAME, R.MPA_DESCRIPTION FROM FILMS F\n" +
                 "LEFT JOIN RATING_MPA R ON F.RATING_MPA_ID=R.MPA_ID\n" +
                 "WHERE F.FILM_ID=?";
         try {
@@ -105,8 +102,6 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private Film mapRowToFilm(ResultSet rs, int i) throws SQLException {
-        Set<Genre> genres = new TreeSet<>(Comparator.comparingInt(Genre::getId));
-
         Mpa mpa = Mpa.builder()
                 .id(rs.getInt("rating_mpa_id"))
                 .name(rs.getString("mpa_name"))
@@ -120,21 +115,10 @@ public class FilmDbStorage implements FilmStorage {
                 .releaseDate(rs.getDate("release_date").toLocalDate())
                 .duration(rs.getInt("duration"))
                 .mpa(mpa)
-                .likes(likesStorage.getLikesByFilmId(rs.getLong("film_id")))
                 .build();
-        do {
-            if (rs.getString("genre_name") == null) {
-                break;
-            }
-            genres.add(Genre.builder()
-                    .id(rs.getInt("genre_id"))
-                    .name(rs.getString("genre_name"))
-                    .build()
-            );
-        } while (rs.next());
 
         film.setLikes(likesStorage.getLikesByFilmId(film.getId()));
-        film.setGenres(genres);
+        film.setGenres(fgStorage.getGenresByFilmId(film.getId()));
         return film;
     }
 }
