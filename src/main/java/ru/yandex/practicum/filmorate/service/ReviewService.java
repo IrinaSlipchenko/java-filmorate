@@ -3,12 +3,11 @@ package ru.yandex.practicum.filmorate.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NoSuchReviewIdException;
+import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.Review;
-import ru.yandex.practicum.filmorate.storage.db.FilmDbStorage;
-import ru.yandex.practicum.filmorate.storage.db.ReviewDbStorage;
-import ru.yandex.practicum.filmorate.storage.db.ReviewLikeDbStorage;
-import ru.yandex.practicum.filmorate.storage.db.UserDbStorage;
+import ru.yandex.practicum.filmorate.storage.db.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,14 +16,18 @@ public class ReviewService {
     private final ReviewDbStorage reviewDbStorage;
     private final UserDbStorage userDbStorage;
     private final FilmDbStorage filmDbStorage;
+    private final FeedDbStorage feedDbStorage;
 
 
     @Autowired
-    public ReviewService(ReviewDbStorage reviewDbStorage, UserDbStorage userDbStorage, FilmDbStorage filmDbStorage, ReviewLikeDbStorage reviewLikeDbStorage) {
+    public ReviewService(ReviewDbStorage reviewDbStorage
+            , UserDbStorage userDbStorage
+            , FilmDbStorage filmDbStorage
+            , FeedDbStorage feedDbStorage) {
         this.reviewDbStorage = reviewDbStorage;
         this.userDbStorage = userDbStorage;
         this.filmDbStorage = filmDbStorage;
-
+        this.feedDbStorage = feedDbStorage;
     }
 
     public Review add(Review review){
@@ -35,6 +38,7 @@ public class ReviewService {
 
     public Review update(Review review){
         if( review.getReviewId() == null ) return add(review);
+        review.setFilmId(reviewDbStorage.get(review.getReviewId()).getFilmId());
         if( !reviewDbStorage.containsIdReview(review.getReviewId()) ) {
             throw new NoSuchReviewIdException("Отзыв по ID = " + review.getReviewId() + " не найден");
         }

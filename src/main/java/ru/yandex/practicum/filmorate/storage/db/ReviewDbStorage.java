@@ -2,18 +2,17 @@ package ru.yandex.practicum.filmorate.storage.db;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.Review;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,11 +20,15 @@ import java.util.List;
 public class ReviewDbStorage {
     private final JdbcTemplate jdbcTemplate;
     private final ReviewLikeDbStorage reviewLikeDbStorage;
+    private final  FeedDbStorage feedDbStorage;
 
     @Autowired
-    public ReviewDbStorage(JdbcTemplate jdbcTemplate, ReviewLikeDbStorage reviewLikeDbStorage) {
+    public ReviewDbStorage(JdbcTemplate jdbcTemplate
+            , ReviewLikeDbStorage reviewLikeDbStorage
+            , FeedDbStorage feedDbStorage) {
         this.jdbcTemplate = jdbcTemplate;
         this.reviewLikeDbStorage = reviewLikeDbStorage;
+        this.feedDbStorage = feedDbStorage;
     }
 
     public Review add(Review review){
@@ -43,6 +46,13 @@ public class ReviewDbStorage {
         }, keyHolder);
         review.setReviewId(keyHolder.getKey().longValue());
         review.setUseful(reviewLikeDbStorage.getResultUseful(review.getReviewId()));
+        feedDbStorage.add(Feed.builder()
+                .timestamp(LocalDateTime.now())
+                .userId(review.getUserId())
+                .eventType("REVIEW")
+                .operation("ADD")
+                .entityId(review.getFilmId())
+                .build());
         return review;
     }
 
@@ -54,6 +64,13 @@ public class ReviewDbStorage {
     public Review update(Review review){
         String sql = "UPDATE reviews SET content = ?, is_positive = ? WHERE review_id = ?";
         jdbcTemplate.update(sql,review.getContent(),review.getIsPositive(),review.getReviewId());
+        feedDbStorage.add(Feed.builder()
+                .timestamp(LocalDateTime.now())
+                .userId(review.getUserId())
+                .eventType("REVIEW")
+                .operation("UPDATE")
+                .entityId(review.getFilmId())
+                .build());
         return get(review.getReviewId());
     }
 
@@ -61,6 +78,13 @@ public class ReviewDbStorage {
         Review review = get(reviewId);
         String sql = "DELETE FROM reviews WHERE review_id = ?";
         jdbcTemplate.update(sql,review.getReviewId());
+        feedDbStorage.add(Feed.builder()
+                .timestamp(LocalDateTime.now())
+                .userId(review.getUserId())
+                .eventType("REVIEW")
+                .operation("REMOVE")
+                .entityId(review.getFilmId())
+                .build());
         return review;
     }
 
