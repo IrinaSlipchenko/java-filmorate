@@ -55,4 +55,10 @@ public class FilmService {
     public List<Film> getPopularFilms(int count) {
         return filmStorage.getPopularFilms(count);
     }
+
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        User user = userStorage.findUserById(userId);
+        User friend = userStorage.findUserById(friendId);
+        return filmStorage.getCommonFilms(user.getId(),friend.getId());
+    }
 }
