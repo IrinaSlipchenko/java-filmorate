@@ -8,6 +8,7 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.Set;
+import java.util.SortedSet;
 
 @Data
 @Builder
@@ -21,6 +22,6 @@ public class Film {
     @Positive
     private Integer duration;
     private Set<Long> likes;
-    private Set<Genre> genres;
+    private SortedSet<Genre> genres;
     private Mpa mpa;
 }
