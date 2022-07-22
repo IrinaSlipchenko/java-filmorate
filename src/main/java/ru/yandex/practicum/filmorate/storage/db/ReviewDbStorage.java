@@ -50,7 +50,7 @@ public class ReviewDbStorage {
                 .userId(review.getUserId())
                 .eventType("REVIEW")
                 .operation("ADD")
-                .entityId(review.getFilmId())
+                .entityId(review.getReviewId())
                 .build());
         return review;
     }
@@ -68,7 +68,7 @@ public class ReviewDbStorage {
                 .userId(review.getUserId())
                 .eventType("REVIEW")
                 .operation("UPDATE")
-                .entityId(review.getFilmId())
+                .entityId(review.getReviewId())
                 .build());
         return get(review.getReviewId());
     }
@@ -82,7 +82,7 @@ public class ReviewDbStorage {
                 .userId(review.getUserId())
                 .eventType("REVIEW")
                 .operation("REMOVE")
-                .entityId(review.getFilmId())
+                .entityId(review.getReviewId())
                 .build());
         return review;
     }

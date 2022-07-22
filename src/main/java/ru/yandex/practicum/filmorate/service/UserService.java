@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.storage.db.FeedDbStorage;
+import ru.yandex.practicum.filmorate.storage.db.FriendsStorage;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -17,7 +18,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserService {
     private final UserStorage userStorage;
-    private  final FeedDbStorage feedDbStorage;
+    private final FeedDbStorage feedDbStorage;
+    private final FriendsStorage friendsStorage;
 
     public List<User> findAll() {
         return userStorage.findAll();
@@ -43,24 +45,32 @@ public class UserService {
         User user = userStorage.findUserById(id);
         userStorage.findUserById(friendId); // validate friend
         user.getFriends().add(friendId);
+        if(!friendsStorage.containsFriend(id,friendId)){
+            userStorage.update(user);
+            feedDbStorage.add(Feed.builder()
+                    .timestamp(new Timestamp(System.currentTimeMillis()).getTime())
+                    .userId(id)
+                    .eventType("FRIEND")
+                    .operation("ADD")
+                    .entityId(friendId)
+                    .build());
+        }
         userStorage.update(user);
-        feedDbStorage.add(Feed.builder()
-                .timestamp(new Timestamp(System.currentTimeMillis()).getTime())
-                .userId(id)
-                .eventType("FRIEND")
-                .operation("ADD")
-                .entityId(friendId)
-                .build());
         return user;
     }
 
     public User friendDelete(Long id, Long friendId) {
         User user = userStorage.findUserById(id);
         userStorage.findUserById(friendId); // validate friend
-
         user.getFriends().remove(friendId);
         userStorage.update(user);
-
+        feedDbStorage.add(Feed.builder()
+                .timestamp(new Timestamp(System.currentTimeMillis()).getTime())
+                .userId(id)
+                .eventType("FRIEND")
+                .operation("REMOVE")
+                .entityId(friendId)
+                .build());
         return user;
     }
 

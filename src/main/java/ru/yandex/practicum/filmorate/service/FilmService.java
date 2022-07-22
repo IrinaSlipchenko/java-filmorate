@@ -48,16 +48,7 @@ public class FilmService {
         Film film = filmStorage.findFilmById(filmID);
         User user = userStorage.findUserById(userID);
         film.getLikes().add(user.getId());
-        if(likesDbStorage.containsLike(filmID, userID)) {
-            filmStorage.update(film);
-            feedDbStorage.add(Feed.builder()
-                    .timestamp(new Timestamp(System.currentTimeMillis()).getTime())
-                    .userId(userID)
-                    .eventType("LIKE")
-                    .operation("UPDATE")
-                    .entityId(filmID)
-                    .build());
-        }else {
+        if(!likesDbStorage.containsLike(filmID, userID)) {
             filmStorage.update(film);
             feedDbStorage.add(Feed.builder()
                     .timestamp(new Timestamp(System.currentTimeMillis()).getTime())
@@ -67,6 +58,7 @@ public class FilmService {
                     .entityId(filmID)
                     .build());
         }
+        filmStorage.update(film);
         return film;
     }
 
