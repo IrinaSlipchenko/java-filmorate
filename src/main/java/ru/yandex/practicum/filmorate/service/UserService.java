@@ -2,11 +2,11 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,12 +31,7 @@ public class UserService {
     }
 
     public User deleteUserById(Long userID) {
-        User user = userStorage.findUserById(userID);
-        Set<Long> myFriends = user.getFriends();
-        for (Long id : myFriends) {
-            userStorage.findUserById(id).getFriends().remove(userID);
-        }
-        return userStorage.delete(userID);
+        return userStorage.deleteUserById(userID);
     }
 
     public User friendAdd(Long id, Long friendId) {
@@ -60,6 +55,10 @@ public class UserService {
     }
 
     public List<User> allMyFriends(Long id) {
+        User user = userStorage.findUserById(id);
+        if (user == null) {
+            throw new UserNotFoundException("Пользователь по ID = " + user.getId() + " не найден");
+        }
         return userStorage.allMyFriends(id);
     }
 

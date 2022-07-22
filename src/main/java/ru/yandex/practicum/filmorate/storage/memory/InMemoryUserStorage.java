@@ -40,7 +40,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User delete(Long userId) {
+    public User deleteUserById(Long userId) {
         if (users.containsKey(userId)) {
             User user = users.get(userId);
             users.remove(userId);
