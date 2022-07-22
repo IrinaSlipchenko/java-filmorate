@@ -2,11 +2,15 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.db.FeedDbStorage;
+import ru.yandex.practicum.filmorate.storage.db.LikesDbStorage;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -15,6 +19,8 @@ public class FilmService {
 
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
+    private final FeedDbStorage feedDbStorage;
+    private final LikesDbStorage likesDbStorage;
 
     public List<Film> findAll() {
         return filmStorage.findAll();
@@ -40,6 +46,21 @@ public class FilmService {
         Film film = filmStorage.findFilmById(filmID);
         User user = userStorage.findUserById(userID);
         film.getLikes().add(user.getId());
+        if(likesDbStorage.containsLike(filmID, userID)) {
+            feedDbStorage.add(Feed.builder()
+                    .timestamp(LocalDateTime.now())
+                    .userId(userID)
+                    .eventType("LIKE")
+                    .operation("UPDATE")
+                    .entityId(filmID)
+                    .build());
+        }else feedDbStorage.add(Feed.builder()
+                    .timestamp(LocalDateTime.now())
+                    .userId(userID)
+                    .eventType("LIKE")
+                    .operation("ADD")
+                    .entityId(filmID)
+                    .build());
         filmStorage.update(film);
         return film;
     }
@@ -49,6 +70,13 @@ public class FilmService {
         User user = userStorage.findUserById(userId);
         film.getLikes().remove(user.getId());
         filmStorage.update(film);
+        feedDbStorage.add(Feed.builder()
+                .timestamp(LocalDateTime.now())
+                .userId(userId)
+                .eventType("LIKE")
+                .operation("REMOVE")
+                .entityId(id)
+                .build());
         return film;
     }
 

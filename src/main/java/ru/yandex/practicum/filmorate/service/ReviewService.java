@@ -42,6 +42,7 @@ public class ReviewService {
             throw new NoSuchReviewIdException("Отзыв по ID = " + review.getReviewId() + " не найден");
         }
         review.setFilmId(reviewDbStorage.get(review.getReviewId()).getFilmId());
+        review.setUserId(reviewDbStorage.get(review.getReviewId()).getUserId());
         return reviewDbStorage.update(review);
     }
 

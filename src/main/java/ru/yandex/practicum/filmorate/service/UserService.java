@@ -2,9 +2,11 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.db.FeedDbStorage;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,6 +15,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserService {
     private final UserStorage userStorage;
+    private  final FeedDbStorage feedDbStorage;
 
     public List<User> findAll() {
         return userStorage.findAll();
@@ -67,5 +70,10 @@ public class UserService {
         List<User> otherFriends = allMyFriends(otherId);
 
         return myFriends.stream().filter(otherFriends::contains).collect(Collectors.toList());
+    }
+
+    public List<Feed> feed(Long id){
+        userStorage.findUserById(id);
+        return feedDbStorage.get(id);
     }
 }
