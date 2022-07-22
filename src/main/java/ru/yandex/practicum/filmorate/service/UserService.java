@@ -27,10 +27,6 @@ public class UserService {
     }
 
     public User findUserById(Long userID) {
-        User user = userStorage.findUserById(userID);
-        if (user == null) {
-            throw new UserNotFoundException("Пользователь по ID = " + user.getId() + " не найден");
-        }
         return userStorage.findUserById(userID);
     }
 
