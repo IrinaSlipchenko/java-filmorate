@@ -36,7 +36,7 @@ public class ErrorHandler {
     }
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleNoSuchReviewIdException (final NoSuchReviewIdException e) {
+    public ErrorResponse handleNoSuchReviewIdException (final NoSuchIdException e) {
         return new ErrorResponse(e.getMessage());
     }
 

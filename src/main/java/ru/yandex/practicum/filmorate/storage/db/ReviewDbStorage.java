@@ -13,6 +13,8 @@ import ru.yandex.practicum.filmorate.model.Review;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +32,8 @@ public class ReviewDbStorage {
             throw new AlreadyExistException("Пользователь с ID = "
                     + review.getUserId() + " уже оставлял отзыв на фильм ID = " + review.getFilmId());
         }
-        final String sql = "INSERT INTO reviews ( content, is_positive, user_id, film_id, useful )" +
-                " VALUES ( ? ,? ,? ,? ,? )";
+        final String sql = "INSERT INTO reviews ( content, is_positive, user_id, film_id )" +
+                " VALUES ( ? ,? ,? ,? )";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement stmt = connection.prepareStatement(sql, new String[]{"review_id"});
@@ -39,12 +41,12 @@ public class ReviewDbStorage {
             stmt.setBoolean(2, review.getIsPositive());
             stmt.setLong(3,review.getUserId());
             stmt.setLong(4,review.getFilmId());
-            stmt.setInt(5, 0);
             return stmt;
         }, keyHolder);
         review.setReviewId(keyHolder.getKey().longValue());
+        review.setUseful(reviewLikeDbStorage.getResultUseful(review.getReviewId()));
         feedDbStorage.add(Feed.builder()
-                .timestamp(LocalDateTime.now())
+                .timestamp(new Timestamp(System.currentTimeMillis()).getTime())
                 .userId(review.getUserId())
                 .eventType("REVIEW")
                 .operation("ADD")
@@ -62,7 +64,7 @@ public class ReviewDbStorage {
         String sql = "UPDATE reviews SET content = ?, is_positive = ? WHERE review_id = ?";
         jdbcTemplate.update(sql,review.getContent(),review.getIsPositive(),review.getReviewId());
         feedDbStorage.add(Feed.builder()
-                .timestamp(LocalDateTime.now())
+                .timestamp(new Timestamp(System.currentTimeMillis()).getTime())
                 .userId(review.getUserId())
                 .eventType("REVIEW")
                 .operation("UPDATE")
@@ -76,7 +78,7 @@ public class ReviewDbStorage {
         String sql = "DELETE FROM reviews WHERE review_id = ?";
         jdbcTemplate.update(sql,review.getReviewId());
         feedDbStorage.add(Feed.builder()
-                .timestamp(LocalDateTime.now())
+                .timestamp(new Timestamp(System.currentTimeMillis()).getTime())
                 .userId(review.getUserId())
                 .eventType("REVIEW")
                 .operation("REMOVE")
@@ -86,27 +88,29 @@ public class ReviewDbStorage {
     }
 
     public List<Long> getAllByFilmId (Long filmId, Integer count){
-        final String sql = "SELECT review_id FROM reviews  WHERE film_id = ? ORDER BY useful DESC LIMIT ?";
-        List<Long> result = new ArrayList<>();
-        jdbcTemplate.query(sql,(rs, rowNum) -> result.add(rs.getLong("review_id")),filmId, count);
-        return result;
+        final String sql = "SELECT r.review_id, "
+                + " SUM( CASE WHEN  rl.is_useful IS NULL THEN  0 ELSE CASE WHEN  rl.is_useful THEN  1 ELSE -1 END END) "
+                + " AS uset FROM reviews AS r LEFT JOIN review_like AS rl ON r.review_id = rl.review_id "
+                + " WHERE r.film_id = ? GROUP BY (r.review_id) ORDER BY uset DESC LIMIT ?";
+        return jdbcTemplate.query(sql,(rs, rowNum) -> rs.getLong("review_id"),filmId, count);
+
     }
 
     public List<Long> getAll (Integer count){
-        final String sql = "SELECT review_id FROM reviews ORDER BY useful DESC LIMIT ?";
-        List<Long> result = new ArrayList<>();
-        jdbcTemplate.query(sql,(rs, rowNum) -> result.add(rs.getLong("review_id")), count);
-        return result;
+        final String sql = "SELECT r.review_id, "
+        + " SUM( CASE WHEN  rl.is_useful IS NULL THEN  0 ELSE CASE WHEN  rl.is_useful THEN  1 ELSE -1 END END) "
+        + " AS uset FROM reviews AS r LEFT JOIN review_like AS rl ON r.review_id = rl.review_id "
+        + " GROUP BY (r.review_id) ORDER BY uset DESC LIMIT ?";
+        return jdbcTemplate.query(sql,(rs, rowNum) -> rs.getLong("review_id"), count);
     }
 
     public Boolean containsIdReview(Long reviewId){
-        final String sql = "SELECT * FROM reviews WHERE review_id = ?";
+        final String sql = "SELECT review_id FROM reviews WHERE review_id = ?";
         return jdbcTemplate.queryForList(sql, reviewId).size()>0;
     }
 
     public Boolean addReaction(Long id, Long userId,Boolean isUseful){
         if(reviewLikeDbStorage.addReaction(id, userId, isUseful)) {
-            updateUseful(id);
             return true;
         }
         return false;
@@ -114,14 +118,12 @@ public class ReviewDbStorage {
 
     public Boolean deleteLike (Long id, Long userId) {
         if( reviewLikeDbStorage.deleteReaction(id,userId)){
-            updateUseful(id);
             return true;
         }
         return false;
     }
     public Boolean deleteDislike (Long id, Long userId) {
         if( reviewLikeDbStorage.deleteDislikeReaction(id,userId)){
-            updateUseful(id);
             return true;
         }
         return false;
@@ -138,14 +140,5 @@ public class ReviewDbStorage {
         review.setUseful(reviewLikeDbStorage.getResultUseful(review.getReviewId()));
         return review;
     }
-
-    private void updateUseful(Long idReview){
-        final String sql = "UPDATE reviews SET useful = ? WHERE review_id = ?";
-        jdbcTemplate.update(sql, reviewLikeDbStorage.getResultUseful(idReview),idReview);
-    }
-
-
-
-
 
 }

@@ -8,6 +8,8 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.storage.db.FeedDbStorage;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,12 +40,17 @@ public class UserService {
     }
 
     public User friendAdd(Long id, Long friendId) {
-
         User user = userStorage.findUserById(id);
         userStorage.findUserById(friendId); // validate friend
-
         user.getFriends().add(friendId);
         userStorage.update(user);
+        feedDbStorage.add(Feed.builder()
+                .timestamp(new Timestamp(System.currentTimeMillis()).getTime())
+                .userId(id)
+                .eventType("FRIEND")
+                .operation("ADD")
+                .entityId(friendId)
+                .build());
         return user;
     }
 

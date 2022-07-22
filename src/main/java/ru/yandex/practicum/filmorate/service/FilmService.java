@@ -10,6 +10,8 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.storage.db.FeedDbStorage;
 import ru.yandex.practicum.filmorate.storage.db.LikesDbStorage;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -47,21 +49,24 @@ public class FilmService {
         User user = userStorage.findUserById(userID);
         film.getLikes().add(user.getId());
         if(likesDbStorage.containsLike(filmID, userID)) {
+            filmStorage.update(film);
             feedDbStorage.add(Feed.builder()
-                    .timestamp(LocalDateTime.now())
+                    .timestamp(new Timestamp(System.currentTimeMillis()).getTime())
                     .userId(userID)
                     .eventType("LIKE")
                     .operation("UPDATE")
                     .entityId(filmID)
                     .build());
-        }else feedDbStorage.add(Feed.builder()
-                    .timestamp(LocalDateTime.now())
+        }else {
+            filmStorage.update(film);
+            feedDbStorage.add(Feed.builder()
+                    .timestamp(new Timestamp(System.currentTimeMillis()).getTime())
                     .userId(userID)
                     .eventType("LIKE")
                     .operation("ADD")
                     .entityId(filmID)
                     .build());
-        filmStorage.update(film);
+        }
         return film;
     }
 
@@ -71,7 +76,7 @@ public class FilmService {
         film.getLikes().remove(user.getId());
         filmStorage.update(film);
         feedDbStorage.add(Feed.builder()
-                .timestamp(LocalDateTime.now())
+                .timestamp(new Timestamp(System.currentTimeMillis()).getTime())
                 .userId(userId)
                 .eventType("LIKE")
                 .operation("REMOVE")

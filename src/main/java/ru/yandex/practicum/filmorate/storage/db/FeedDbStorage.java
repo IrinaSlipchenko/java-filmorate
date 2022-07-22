@@ -24,7 +24,7 @@ public class FeedDbStorage {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement stmt = connection.prepareStatement(sql, new String[]{"event_id"});
-            stmt.setTimestamp(1, Timestamp.valueOf(feed.getTimestamp()));
+            stmt.setTimestamp(1, new Timestamp(feed.getTimestamp()) );
             stmt.setLong(2,feed.getUserId());
             stmt.setString(3,feed.getEventType());
             stmt.setString(4,feed.getOperation());
@@ -41,7 +41,7 @@ public class FeedDbStorage {
 
     private Feed mapRowToFeed(ResultSet rs, int rowNum) throws SQLException {
         return Feed.builder()
-                .timestamp(rs.getTimestamp("event_time").toLocalDateTime())
+                .timestamp(rs.getTimestamp("event_time").getTime())
                 .userId(rs.getLong("user_id"))
                 .eventType(rs.getString("event_type"))
                 .operation(rs.getString("operation"))
