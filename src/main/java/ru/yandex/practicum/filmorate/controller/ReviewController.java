@@ -68,14 +68,14 @@ public class ReviewController {
     @DeleteMapping("/{id}/like/{userId}")
     public Boolean deleteLike(@PathVariable Long id,
                               @PathVariable Long userId) {
-        return reviewService.deleteLike(id, userId);
+        return reviewService.deleteReaction(id, userId,true);
     }
 
 //-  пользователь удаляет дизлайк отзыву.
     @DeleteMapping ("/{id}/dislike/{userId}")
     public Boolean deleteDislike(@PathVariable Long id,
                             @PathVariable Long userId) {
-        return reviewService.deleteDislike(id, userId);
+        return reviewService.deleteReaction(id, userId,false);
     }
 
 }

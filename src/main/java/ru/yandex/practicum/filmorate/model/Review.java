@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.model;
 
-import jdk.jfr.BooleanFlag;
 import lombok.Builder;
 import lombok.Data;
 

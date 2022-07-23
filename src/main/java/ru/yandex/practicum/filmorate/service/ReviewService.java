@@ -1,34 +1,25 @@
 package ru.yandex.practicum.filmorate.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.NoSuchReviewIdException;
-import ru.yandex.practicum.filmorate.model.Feed;
+import ru.yandex.practicum.filmorate.exception.NoSuchIdException;
 import ru.yandex.practicum.filmorate.model.Review;
-import ru.yandex.practicum.filmorate.storage.db.*;
+import ru.yandex.practicum.filmorate.storage.db.FeedDbStorage;
+import ru.yandex.practicum.filmorate.storage.db.FilmDbStorage;
+import ru.yandex.practicum.filmorate.storage.db.ReviewDbStorage;
+import ru.yandex.practicum.filmorate.storage.db.UserDbStorage;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ReviewService {
     private final ReviewDbStorage reviewDbStorage;
     private final UserDbStorage userDbStorage;
     private final FilmDbStorage filmDbStorage;
     private final FeedDbStorage feedDbStorage;
 
-
-    @Autowired
-    public ReviewService(ReviewDbStorage reviewDbStorage
-            , UserDbStorage userDbStorage
-            , FilmDbStorage filmDbStorage
-            , FeedDbStorage feedDbStorage) {
-        this.reviewDbStorage = reviewDbStorage;
-        this.userDbStorage = userDbStorage;
-        this.filmDbStorage = filmDbStorage;
-        this.feedDbStorage = feedDbStorage;
-    }
 
     public Review add(Review review){
         userDbStorage.findUserById(review.getUserId());
@@ -39,22 +30,23 @@ public class ReviewService {
     public Review update(Review review){
         if( review.getReviewId() == null ) return add(review);
         if( !reviewDbStorage.containsIdReview(review.getReviewId()) ) {
-            throw new NoSuchReviewIdException("Отзыв по ID = " + review.getReviewId() + " не найден");
+            throw new NoSuchIdException("Отзыв по ID = " + review.getReviewId() + " не найден");
         }
         review.setFilmId(reviewDbStorage.get(review.getReviewId()).getFilmId());
+        review.setUserId(reviewDbStorage.get(review.getReviewId()).getUserId());
         return reviewDbStorage.update(review);
     }
 
     public Review get( Long reviewId){
         if( !reviewDbStorage.containsIdReview(reviewId) ) {
-            throw new NoSuchReviewIdException("Отзыв по ID = " + reviewId + " не найден");
+            throw new NoSuchIdException("Отзыв по ID = " + reviewId + " не найден");
         }
         return reviewDbStorage.get(reviewId);
     }
 
     public Review delete (Long reviewId){
         if( !reviewDbStorage.containsIdReview(reviewId) ) {
-            throw new NoSuchReviewIdException("Отзыв по ID = " + reviewId + " не найден");
+            throw new NoSuchIdException("Отзыв по ID = " + reviewId + " не найден");
         }
         return reviewDbStorage.delete(reviewId);
     }
@@ -73,7 +65,7 @@ public class ReviewService {
 
     public Boolean addLike(Long id, Long userId){
         if(!reviewDbStorage.containsIdReview(id)){
-            throw  new NoSuchReviewIdException("Отзыв по ID = " + id + " не найден");
+            throw  new NoSuchIdException("Отзыв по ID = " + id + " не найден");
         }
         userDbStorage.findUserById(userId);
         return reviewDbStorage.addReaction(id,userId,true);
@@ -81,27 +73,17 @@ public class ReviewService {
 
     public Boolean addDislike(Long id, Long userId){
         if(!reviewDbStorage.containsIdReview(id)){
-            throw  new NoSuchReviewIdException("Отзыв по ID = " + id + " не найден");
+            throw  new NoSuchIdException("Отзыв по ID = " + id + " не найден");
         }
         userDbStorage.findUserById(userId);
         return reviewDbStorage.addReaction(id,userId,false);
     }
 
-    public Boolean deleteDislike(Long id, Long userId){
+    public Boolean deleteReaction(Long id, Long userId, Boolean isUseful){
         if(!reviewDbStorage.containsIdReview(id)){
-            throw  new NoSuchReviewIdException("Отзыв по ID = " + id + " не найден");
+            throw  new NoSuchIdException("Отзыв по ID = " + id + " не найден");
         }
         userDbStorage.findUserById(userId);
-        return reviewDbStorage.deleteDislike(id,userId);
+        return reviewDbStorage.deleteReaction(id ,userId, isUseful);
     }
-    public Boolean deleteLike(Long id, Long userId){
-        if(!reviewDbStorage.containsIdReview(id)){
-            throw  new NoSuchReviewIdException("Отзыв по ID = " + id + " не найден");
-        }
-        userDbStorage.findUserById(userId);
-        return reviewDbStorage.deleteLike(id,userId);
-    }
-
-
-
 }

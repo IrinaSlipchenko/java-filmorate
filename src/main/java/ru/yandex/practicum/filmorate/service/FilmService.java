@@ -4,10 +4,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import static ru.yandex.practicum.filmorate.model.feedEnum.OperationType.*;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.db.FeedDbStorage;
+import ru.yandex.practicum.filmorate.storage.db.LikesDbStorage;
 
 import java.util.List;
+
+
 
 @Service
 @RequiredArgsConstructor
@@ -15,6 +20,8 @@ public class FilmService {
 
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
+    private final FeedDbStorage feedDbStorage;
+    private final LikesDbStorage likesDbStorage;
 
     public List<Film> findAll() {
         return filmStorage.findAll();
@@ -40,7 +47,11 @@ public class FilmService {
         Film film = filmStorage.findFilmById(filmID);
         User user = userStorage.findUserById(userID);
         film.getLikes().add(user.getId());
-        filmStorage.update(film);
+        if(!likesDbStorage.containsLike(filmID, userID)) {
+            filmStorage.update(film);
+            feedDbStorage.addLike(userID, ADD, filmID );
+        }
+        else filmStorage.update(film);
         return film;
     }
 
@@ -49,6 +60,7 @@ public class FilmService {
         User user = userStorage.findUserById(userId);
         film.getLikes().remove(user.getId());
         filmStorage.update(film);
+        feedDbStorage.addLike(userId, REMOVE, id );
         return film;
     }
 

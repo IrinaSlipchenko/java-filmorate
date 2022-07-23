@@ -36,13 +36,13 @@ public class ErrorHandler {
     }
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleNoSuchReviewIdException (final NoSuchReviewIdException e) {
+    public ErrorResponse handleNoSuchIdException (final NoSuchIdException e) {
         return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleNoSuchNoSuchReactFind (final NoSuchReactFind e) {
+    public ErrorResponse handleNoSuchReactFind (final NoSuchReactFind e) {
         return new ErrorResponse(e.getMessage());
     }
 

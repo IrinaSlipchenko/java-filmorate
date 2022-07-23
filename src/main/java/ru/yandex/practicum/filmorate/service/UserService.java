@@ -2,9 +2,13 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
+import static ru.yandex.practicum.filmorate.model.feedEnum.OperationType.*;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.db.FeedDbStorage;
+import ru.yandex.practicum.filmorate.storage.db.FriendsStorage;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,6 +17,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserService {
     private final UserStorage userStorage;
+    private final FeedDbStorage feedDbStorage;
+    private final FriendsStorage friendsStorage;
 
     public List<User> findAll() {
         return userStorage.findAll();
@@ -35,22 +41,23 @@ public class UserService {
     }
 
     public User friendAdd(Long id, Long friendId) {
-
         User user = userStorage.findUserById(id);
         userStorage.findUserById(friendId); // validate friend
-
         user.getFriends().add(friendId);
-        userStorage.update(user);
+        if(!friendsStorage.containsFriend(id,friendId)){
+            userStorage.update(user);
+            feedDbStorage.addFriend(id, ADD, friendId);
+        }
+        else userStorage.update(user);
         return user;
     }
 
     public User friendDelete(Long id, Long friendId) {
         User user = userStorage.findUserById(id);
         userStorage.findUserById(friendId); // validate friend
-
         user.getFriends().remove(friendId);
         userStorage.update(user);
-
+        feedDbStorage.addFriend(id, REMOVE, friendId);
         return user;
     }
 
@@ -67,5 +74,10 @@ public class UserService {
         List<User> otherFriends = allMyFriends(otherId);
 
         return myFriends.stream().filter(otherFriends::contains).collect(Collectors.toList());
+    }
+
+    public List<Feed> feed(Long id){
+        userStorage.findUserById(id);
+        return feedDbStorage.get(id);
     }
 }
