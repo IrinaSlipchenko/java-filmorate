@@ -9,11 +9,7 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.Set;
-<<<<<<< HEAD
 import java.util.SortedSet;
-=======
-import java.util.TreeSet;
->>>>>>> 3592060 (directors without search)
 
 @Data
 @Builder
@@ -27,12 +23,8 @@ public class Film {
     @Positive
     private Integer duration;
     private Set<Long> likes;
-<<<<<<< HEAD
     private SortedSet<Genre> genres;
     @NotNull
-=======
-    private TreeSet<Genre> genres;
->>>>>>> 3592060 (directors without search)
     private Mpa mpa;
     private Set<Director> directors;
 }
