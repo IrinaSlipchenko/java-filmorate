@@ -2,10 +2,14 @@ package ru.yandex.practicum.filmorate.storage.memory;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.SortParam;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
@@ -61,6 +65,11 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> getCommonFilms(Long userId, Long friendId) {
+        return null;
+    }
+
+    @Override
+    public List<Film> getSortedFilmsByDirector(Long directorId, SortParam sortBy) {
         return null;
     }
 

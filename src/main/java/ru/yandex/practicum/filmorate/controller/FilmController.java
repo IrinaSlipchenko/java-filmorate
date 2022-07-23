@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.SortParam;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.FilmValidator;
 
@@ -67,6 +68,13 @@ public class FilmController {
     @GetMapping("/common")
     public List<Film> getCommonFilms(@RequestParam(value = "userId") Long userId
             , @RequestParam(value = "friendId") Long friendId) {
-        return filmService.getCommonFilms(userId,friendId);
+        return filmService.getCommonFilms(userId, friendId);
+    }
+
+    @GetMapping("/director/{directorId}")
+    public List<Film> getSortedFilmsByDirector(@PathVariable Long directorId,
+                                               @RequestParam(value = "sortBy") SortParam sortBy) {
+        return filmService.getSortedFilmsByDirector(directorId, sortBy);
+
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.model.SortParam;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.sql.ResultSet;
@@ -143,5 +144,30 @@ public class FilmDbStorage implements FilmStorage {
         film.setGenres(fgStorage.getGenresByFilmId(film.getId()));
         film.setDirectors(directorDbStorage.getDirectorsByFilmId(film.getId()));
         return film;
+    }
+
+    @Override
+    public List<Film> getSortedFilmsByDirector(Long directorId, SortParam sortBy) {
+        directorDbStorage.findDirectorById(directorId);
+
+        final String sqlYear = "SELECT F.*, R.MPA_NAME, R.MPA_DESCRIPTION FROM FILMS F\n" +
+                "                LEFT JOIN RATING_MPA R ON F.RATING_MPA_ID=R.MPA_ID\n" +
+                "                LEFT JOIN FILM_DIRECTORS FD on F.FILM_ID = FD.FILM_ID\n" +
+                "                WHERE FD.DIRECTOR_ID=?\n" +
+                "                ORDER BY EXTRACT(year FROM RELEASE_DATE)";
+
+        final String sqlLikes = "SELECT F.*, R.MPA_NAME, R.MPA_DESCRIPTION FROM FILMS F\n" +
+                "                LEFT JOIN RATING_MPA R ON F.RATING_MPA_ID=R.MPA_ID\n" +
+                "                LEFT JOIN FILM_DIRECTORS FD on F.FILM_ID = FD.FILM_ID\n" +
+                "                LEFT JOIN FILM_LIKES FL on F.FILM_ID = FL.FILM_ID\n" +
+                "                WHERE FD.DIRECTOR_ID=?\n" +
+                "                GROUP BY F.FILM_ID\n" +
+                "                ORDER BY COUNT(USER_ID) DESC";
+
+        return sortBy.equals(SortParam.likes)
+                ?
+                jdbcTemplate.query(sqlLikes, this::mapRowToFilm, directorId)
+                :
+                jdbcTemplate.query(sqlYear, this::mapRowToFilm, directorId);
     }
 }
