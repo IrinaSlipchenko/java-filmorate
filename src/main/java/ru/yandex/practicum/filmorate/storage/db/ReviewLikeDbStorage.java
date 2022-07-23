@@ -25,22 +25,15 @@ public class ReviewLikeDbStorage {
         return jdbcTemplate.update(sql,idReview,userId,is_useful) > 0;
     }
 
-    public Boolean deleteReaction (Long idReview, Long userId) {
-        if(!containsReaction(idReview, userId, true) && !containsReaction(idReview, userId, false)){
+    public Boolean deleteReaction (Long idReview, Long userId, Boolean is_useful) {
+        if(!containsReaction(idReview, userId, is_useful)){
+            if(is_useful) throw new NoSuchReactFind( "Пользователь c ID = " + userId
+                    + " не оставлял положительной реакции на отзыв с ID = " + idReview );
             throw new NoSuchReactFind( "Пользователь c ID = " + userId
-                    + " не оставлял реакции на отзыв с ID = " + idReview );
-        }
-        final String sql = "DELETE FROM review_like WHERE review_id =? AND user_id = ?";
-        return jdbcTemplate.update(sql,idReview,userId) > 0;
-    }
-
-    public Boolean deleteDislikeReaction(Long idReview, Long userId) {
-        if(!containsReaction(idReview, userId, false)) {
-            throw new NoSuchReactFind( "Пользователь c ID = " + userId
-                    + " не оставлял  отрицательной реакции на отзыв с ID = " + idReview );
+                    + " не оставлял отрицательной реакции на отзыв с ID = " + idReview );
         }
         final String sql = "DELETE FROM review_like WHERE review_id =? AND user_id = ? AND is_useful = ?";
-        return jdbcTemplate.update(sql,idReview,userId,false) > 0;
+        return jdbcTemplate.update(sql, idReview, userId, is_useful) > 0;
     }
 
     public Boolean containsReaction (Long idReview, Long userId, Boolean is_useful) {

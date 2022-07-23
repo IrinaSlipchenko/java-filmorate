@@ -5,12 +5,11 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
+import static ru.yandex.practicum.filmorate.model.feedEnum.OperationType.*;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.storage.db.FeedDbStorage;
 import ru.yandex.practicum.filmorate.storage.db.FriendsStorage;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,15 +46,9 @@ public class UserService {
         user.getFriends().add(friendId);
         if(!friendsStorage.containsFriend(id,friendId)){
             userStorage.update(user);
-            feedDbStorage.add(Feed.builder()
-                    .timestamp(new Timestamp(System.currentTimeMillis()).getTime())
-                    .userId(id)
-                    .eventType("FRIEND")
-                    .operation("ADD")
-                    .entityId(friendId)
-                    .build());
+            feedDbStorage.addFriend(id, ADD, friendId);
         }
-        userStorage.update(user);
+        else userStorage.update(user);
         return user;
     }
 
@@ -64,13 +57,7 @@ public class UserService {
         userStorage.findUserById(friendId); // validate friend
         user.getFriends().remove(friendId);
         userStorage.update(user);
-        feedDbStorage.add(Feed.builder()
-                .timestamp(new Timestamp(System.currentTimeMillis()).getTime())
-                .userId(id)
-                .eventType("FRIEND")
-                .operation("REMOVE")
-                .entityId(friendId)
-                .build());
+        feedDbStorage.addFriend(id, REMOVE, friendId);
         return user;
     }
 

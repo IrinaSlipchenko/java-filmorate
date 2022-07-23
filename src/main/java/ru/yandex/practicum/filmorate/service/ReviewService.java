@@ -1,32 +1,25 @@
 package ru.yandex.practicum.filmorate.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NoSuchIdException;
 import ru.yandex.practicum.filmorate.model.Review;
-import ru.yandex.practicum.filmorate.storage.db.*;
+import ru.yandex.practicum.filmorate.storage.db.FeedDbStorage;
+import ru.yandex.practicum.filmorate.storage.db.FilmDbStorage;
+import ru.yandex.practicum.filmorate.storage.db.ReviewDbStorage;
+import ru.yandex.practicum.filmorate.storage.db.UserDbStorage;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ReviewService {
     private final ReviewDbStorage reviewDbStorage;
     private final UserDbStorage userDbStorage;
     private final FilmDbStorage filmDbStorage;
     private final FeedDbStorage feedDbStorage;
 
-
-    @Autowired
-    public ReviewService(ReviewDbStorage reviewDbStorage
-            , UserDbStorage userDbStorage
-            , FilmDbStorage filmDbStorage
-            , FeedDbStorage feedDbStorage) {
-        this.reviewDbStorage = reviewDbStorage;
-        this.userDbStorage = userDbStorage;
-        this.filmDbStorage = filmDbStorage;
-        this.feedDbStorage = feedDbStorage;
-    }
 
     public Review add(Review review){
         userDbStorage.findUserById(review.getUserId());
@@ -86,21 +79,11 @@ public class ReviewService {
         return reviewDbStorage.addReaction(id,userId,false);
     }
 
-    public Boolean deleteDislike(Long id, Long userId){
+    public Boolean deleteReaction(Long id, Long userId, Boolean isUseful){
         if(!reviewDbStorage.containsIdReview(id)){
             throw  new NoSuchIdException("Отзыв по ID = " + id + " не найден");
         }
         userDbStorage.findUserById(userId);
-        return reviewDbStorage.deleteDislike(id,userId);
+        return reviewDbStorage.deleteReaction(id ,userId, isUseful);
     }
-    public Boolean deleteLike(Long id, Long userId){
-        if(!reviewDbStorage.containsIdReview(id)){
-            throw  new NoSuchIdException("Отзыв по ID = " + id + " не найден");
-        }
-        userDbStorage.findUserById(userId);
-        return reviewDbStorage.deleteLike(id,userId);
-    }
-
-
-
 }

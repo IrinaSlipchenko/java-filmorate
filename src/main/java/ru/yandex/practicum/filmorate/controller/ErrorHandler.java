@@ -42,7 +42,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleNoSuchNoSuchReactFind (final NoSuchReactFind e) {
+    public ErrorResponse handleNoSuchReactFind (final NoSuchReactFind e) {
         return new ErrorResponse(e.getMessage());
     }
 
