@@ -43,5 +43,4 @@ build/
 .vscode/
 
 ##BD##
-/db
-bd/
+db/

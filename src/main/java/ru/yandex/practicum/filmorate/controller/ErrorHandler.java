@@ -38,7 +38,7 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNoSuchIdException (final NoSuchIdException e) {
         return new ErrorResponse(e.getMessage());
-    }п
+    }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
