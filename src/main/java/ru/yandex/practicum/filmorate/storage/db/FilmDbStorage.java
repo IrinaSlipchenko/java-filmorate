@@ -28,6 +28,8 @@ public class FilmDbStorage implements FilmStorage {
 
     private final LikesDbStorage likesStorage;
 
+    private final DirectorDbStorage directorDbStorage;
+
     @Override
     public List<Film> findAll() {
         String sql = "SELECT F.*, R.MPA_NAME, R.MPA_DESCRIPTION FROM FILMS F\n" +
@@ -45,9 +47,11 @@ public class FilmDbStorage implements FilmStorage {
                 .addValue("release_date", film.getReleaseDate())
                 .addValue("duration", film.getDuration())
                 .addValue("rating_mpa_id", film.getMpa().getId());
+
         Number id = simpleJdbcInsert.executeAndReturnKey(parameters);
         film.setId((Long) id);
         fgStorage.updateGenres(film);
+        directorDbStorage.updateDirectors(film);
         return film;
     }
 
@@ -56,13 +60,14 @@ public class FilmDbStorage implements FilmStorage {
         findFilmById(film.getId());
         String sql = "UPDATE films SET film_name =?," +
                 "description=?, release_date=?," +
-                "duration=?,rating_mpa_id=? WHERE film_id=?";
+                "duration=?, rating_mpa_id=? WHERE film_id=?";
         jdbcTemplate.update(sql, film.getName(), film.getDescription(),
                 film.getReleaseDate(), film.getDuration(),
                 film.getMpa().getId(), film.getId());
         fgStorage.updateGenres(film);
         likesStorage.updateLikes(film);
-        return findFilmById(film.getId());
+        directorDbStorage.updateDirectors(film);
+        return film;
     }
 
     @Override
@@ -116,9 +121,7 @@ public class FilmDbStorage implements FilmStorage {
         System.out.println("friendId: " + friendId);
         List<Long> idList = jdbcTemplate.query(sql, (rs, i) -> rs.getLong("film_id"), userId, friendId);
 
-        List<Film> films = idList.stream().map(this::findFilmById).collect(Collectors.toList());
-
-        return films;
+        return idList.stream().map(this::findFilmById).collect(Collectors.toList());
     }
 
     private Film mapRowToFilm(ResultSet rs, int i) throws SQLException {
@@ -136,9 +139,9 @@ public class FilmDbStorage implements FilmStorage {
                 .duration(rs.getInt("duration"))
                 .mpa(mpa)
                 .build();
-
         film.setLikes(likesStorage.getLikesByFilmId(film.getId()));
         film.setGenres(fgStorage.getGenresByFilmId(film.getId()));
+        film.setDirectors(directorDbStorage.getDirectorsByFilmId(film.getId()));
         return film;
     }
 }
