@@ -11,11 +11,13 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.model.SearchParam;
 import ru.yandex.practicum.filmorate.model.SortParam;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -123,6 +125,45 @@ public class FilmDbStorage implements FilmStorage {
         List<Long> idList = jdbcTemplate.query(sql, (rs, i) -> rs.getLong("film_id"), userId, friendId);
 
         return idList.stream().map(this::findFilmById).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Film> searchFilms(String text, EnumSet<SearchParam> searchParams) {
+        final String sqlAllSearch = "SELECT F.*, R.MPA_NAME, R.MPA_DESCRIPTION FROM FILMS F\n" +
+                "                LEFT JOIN RATING_MPA R ON F.RATING_MPA_ID=R.MPA_ID\n" +
+                "                LEFT JOIN FILM_DIRECTORS FD on F.FILM_ID = FD.FILM_ID\n" +
+                "                LEFT JOIN DIRECTORS D on FD.DIRECTOR_ID = D.DIRECTOR_ID\n" +
+                "                LEFT JOIN FILM_LIKES FL on F.FILM_ID = FL.FILM_ID\n" +
+                "                WHERE D.DIRECTOR_NAME ILIKE '%'||?||'%'\n" +
+                "                OR F.FILM_NAME ILIKE '%'||?||'%'\n" +
+                "                GROUP BY F.FILM_ID\n" +
+                "                ORDER BY COUNT(FL.USER_ID) DESC";
+        final String sqlSearchByDirector = "SELECT F.*, R.MPA_NAME, R.MPA_DESCRIPTION FROM FILMS F\n" +
+                "                LEFT JOIN RATING_MPA R ON F.RATING_MPA_ID=R.MPA_ID\n" +
+                "                LEFT JOIN FILM_DIRECTORS FD on F.FILM_ID = FD.FILM_ID\n" +
+                "                LEFT JOIN DIRECTORS D on FD.DIRECTOR_ID = D.DIRECTOR_ID\n" +
+                "                LEFT JOIN FILM_LIKES FL on F.FILM_ID = FL.FILM_ID\n" +
+                "                WHERE D.DIRECTOR_NAME ILIKE '%'||?||'%'\n" +
+                "                GROUP BY F.FILM_ID\n" +
+                "                ORDER BY COUNT(FL.USER_ID) DESC";
+        final String sqlSearchByFilmTitle = "SELECT F.*, R.MPA_NAME, R.MPA_DESCRIPTION FROM FILMS F\n" +
+                "                LEFT JOIN RATING_MPA R ON F.RATING_MPA_ID=R.MPA_ID\n" +
+                "                LEFT JOIN FILM_DIRECTORS FD on F.FILM_ID = FD.FILM_ID\n" +
+                "                LEFT JOIN DIRECTORS D on FD.DIRECTOR_ID = D.DIRECTOR_ID\n" +
+                "                LEFT JOIN FILM_LIKES FL on F.FILM_ID = FL.FILM_ID\n" +
+                "                WHERE F.FILM_NAME ILIKE '%'||?||'%'\n" +
+                "                GROUP BY F.FILM_ID\n" +
+                "                ORDER BY COUNT(FL.USER_ID) DESC";
+
+        return (searchParams.contains(SearchParam.title) && searchParams.contains(SearchParam.director))
+                ?
+                jdbcTemplate.query(sqlAllSearch, this::mapRowToFilm, text, text)
+                :
+                searchParams.contains(SearchParam.director)
+                ?
+                jdbcTemplate.query(sqlSearchByDirector, this::mapRowToFilm, text)
+                :
+                jdbcTemplate.query(sqlSearchByFilmTitle, this::mapRowToFilm, text);
     }
 
     private Film mapRowToFilm(ResultSet rs, int i) throws SQLException {

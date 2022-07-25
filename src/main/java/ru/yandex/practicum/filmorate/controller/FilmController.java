@@ -4,12 +4,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.SearchParam;
 import ru.yandex.practicum.filmorate.model.SortParam;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.FilmValidator;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
+import java.util.EnumSet;
 import java.util.List;
 
 @Slf4j
@@ -71,10 +74,15 @@ public class FilmController {
         return filmService.getCommonFilms(userId, friendId);
     }
 
+    @GetMapping("search")
+    public List<Film> searchFilms(@RequestParam(value = "query") @NotBlank String text,
+                                  @RequestParam(value = "by") EnumSet<SearchParam> searchParams) {
+        return filmService.searchFilms(text, searchParams);
+    }
+
     @GetMapping("/director/{directorId}")
     public List<Film> getSortedFilmsByDirector(@PathVariable Long directorId,
                                                @RequestParam(value = "sortBy") SortParam sortBy) {
         return filmService.getSortedFilmsByDirector(directorId, sortBy);
-
     }
 }

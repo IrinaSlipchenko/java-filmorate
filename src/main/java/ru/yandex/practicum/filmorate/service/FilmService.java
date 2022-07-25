@@ -3,16 +3,19 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.SearchParam;
 import ru.yandex.practicum.filmorate.model.SortParam;
 import ru.yandex.practicum.filmorate.model.User;
+
 import static ru.yandex.practicum.filmorate.model.feedEnum.OperationType.*;
+
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.storage.db.FeedDbStorage;
 import ru.yandex.practicum.filmorate.storage.db.LikesDbStorage;
 
+import java.util.EnumSet;
 import java.util.List;
-
 
 
 @Service
@@ -48,11 +51,10 @@ public class FilmService {
         Film film = filmStorage.findFilmById(filmID);
         User user = userStorage.findUserById(userID);
         film.getLikes().add(user.getId());
-        if(!likesDbStorage.containsLike(filmID, userID)) {
+        if (!likesDbStorage.containsLike(filmID, userID)) {
             filmStorage.update(film);
-            feedDbStorage.addLike(userID, ADD, filmID );
-        }
-        else filmStorage.update(film);
+            feedDbStorage.addLike(userID, ADD, filmID);
+        } else filmStorage.update(film);
         return film;
     }
 
@@ -61,7 +63,7 @@ public class FilmService {
         User user = userStorage.findUserById(userId);
         film.getLikes().remove(user.getId());
         filmStorage.update(film);
-        feedDbStorage.addLike(userId, REMOVE, id );
+        feedDbStorage.addLike(userId, REMOVE, id);
         return film;
     }
 
@@ -73,6 +75,10 @@ public class FilmService {
         User user = userStorage.findUserById(userId);
         User friend = userStorage.findUserById(friendId);
         return filmStorage.getCommonFilms(user.getId(), friend.getId());
+    }
+
+    public List<Film> searchFilms(String text, EnumSet<SearchParam> searchParams) {
+        return filmStorage.searchFilms(text, searchParams);
     }
 
     public List<Film> getSortedFilmsByDirector(Long directorId, SortParam sortBy) {
