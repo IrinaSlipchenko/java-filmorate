@@ -1,14 +1,13 @@
 package ru.yandex.practicum.filmorate.storage.db;
 
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 @Component
 @RequiredArgsConstructor
@@ -19,7 +18,7 @@ public class FilmGenreDbStorage {
 
     public void updateGenres(Film film) {
         if (film.getGenres() == null) {
-            film.setGenres(new TreeSet<Genre>());
+            film.setGenres(new TreeSet<>());
         }
         String sql = "DELETE FROM film_genre WHERE film_id=?";
         jdbcTemplate.update(sql, film.getId());

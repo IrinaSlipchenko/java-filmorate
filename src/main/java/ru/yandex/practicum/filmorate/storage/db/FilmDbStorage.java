@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.model.SortParam;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.sql.ResultSet;
@@ -27,6 +28,8 @@ public class FilmDbStorage implements FilmStorage {
     private final FilmGenreDbStorage fgStorage;
 
     private final LikesDbStorage likesStorage;
+
+    private final DirectorDbStorage directorDbStorage;
 
     @Override
     public List<Film> findAll() {
@@ -45,9 +48,11 @@ public class FilmDbStorage implements FilmStorage {
                 .addValue("release_date", film.getReleaseDate())
                 .addValue("duration", film.getDuration())
                 .addValue("rating_mpa_id", film.getMpa().getId());
+
         Number id = simpleJdbcInsert.executeAndReturnKey(parameters);
         film.setId((Long) id);
         fgStorage.updateGenres(film);
+        directorDbStorage.updateDirectors(film);
         return film;
     }
 
@@ -56,13 +61,14 @@ public class FilmDbStorage implements FilmStorage {
         findFilmById(film.getId());
         String sql = "UPDATE films SET film_name =?," +
                 "description=?, release_date=?," +
-                "duration=?,rating_mpa_id=? WHERE film_id=?";
+                "duration=?, rating_mpa_id=? WHERE film_id=?";
         jdbcTemplate.update(sql, film.getName(), film.getDescription(),
                 film.getReleaseDate(), film.getDuration(),
                 film.getMpa().getId(), film.getId());
         fgStorage.updateGenres(film);
         likesStorage.updateLikes(film);
-        return findFilmById(film.getId());
+        directorDbStorage.updateDirectors(film);
+        return film;
     }
 
     @Override
@@ -116,9 +122,7 @@ public class FilmDbStorage implements FilmStorage {
         System.out.println("friendId: " + friendId);
         List<Long> idList = jdbcTemplate.query(sql, (rs, i) -> rs.getLong("film_id"), userId, friendId);
 
-        List<Film> films = idList.stream().map(this::findFilmById).collect(Collectors.toList());
-
-        return films;
+        return idList.stream().map(this::findFilmById).collect(Collectors.toList());
     }
 
     private Film mapRowToFilm(ResultSet rs, int i) throws SQLException {
@@ -136,9 +140,34 @@ public class FilmDbStorage implements FilmStorage {
                 .duration(rs.getInt("duration"))
                 .mpa(mpa)
                 .build();
-
         film.setLikes(likesStorage.getLikesByFilmId(film.getId()));
         film.setGenres(fgStorage.getGenresByFilmId(film.getId()));
+        film.setDirectors(directorDbStorage.getDirectorsByFilmId(film.getId()));
         return film;
+    }
+
+    @Override
+    public List<Film> getSortedFilmsByDirector(Long directorId, SortParam sortBy) {
+        directorDbStorage.findDirectorById(directorId);
+
+        final String sqlYear = "SELECT F.*, R.MPA_NAME, R.MPA_DESCRIPTION FROM FILMS F\n" +
+                "                LEFT JOIN RATING_MPA R ON F.RATING_MPA_ID=R.MPA_ID\n" +
+                "                LEFT JOIN FILM_DIRECTORS FD on F.FILM_ID = FD.FILM_ID\n" +
+                "                WHERE FD.DIRECTOR_ID=?\n" +
+                "                ORDER BY EXTRACT(year FROM RELEASE_DATE)";
+
+        final String sqlLikes = "SELECT F.*, R.MPA_NAME, R.MPA_DESCRIPTION FROM FILMS F\n" +
+                "                LEFT JOIN RATING_MPA R ON F.RATING_MPA_ID=R.MPA_ID\n" +
+                "                LEFT JOIN FILM_DIRECTORS FD on F.FILM_ID = FD.FILM_ID\n" +
+                "                LEFT JOIN FILM_LIKES FL on F.FILM_ID = FL.FILM_ID\n" +
+                "                WHERE FD.DIRECTOR_ID=?\n" +
+                "                GROUP BY F.FILM_ID\n" +
+                "                ORDER BY COUNT(USER_ID) DESC";
+
+        return sortBy.equals(SortParam.likes)
+                ?
+                jdbcTemplate.query(sqlLikes, this::mapRowToFilm, directorId)
+                :
+                jdbcTemplate.query(sqlYear, this::mapRowToFilm, directorId);
     }
 }

@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.SortParam;
 import ru.yandex.practicum.filmorate.model.User;
 import static ru.yandex.practicum.filmorate.model.feedEnum.OperationType.*;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
@@ -71,6 +72,10 @@ public class FilmService {
     public List<Film> getCommonFilms(Long userId, Long friendId) {
         User user = userStorage.findUserById(userId);
         User friend = userStorage.findUserById(friendId);
-        return filmStorage.getCommonFilms(user.getId(),friend.getId());
+        return filmStorage.getCommonFilms(user.getId(), friend.getId());
+    }
+
+    public List<Film> getSortedFilmsByDirector(Long directorId, SortParam sortBy) {
+        return filmStorage.getSortedFilmsByDirector(directorId, sortBy);
     }
 }
