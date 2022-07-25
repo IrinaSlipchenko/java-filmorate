@@ -6,7 +6,10 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Feed;
+import ru.yandex.practicum.filmorate.model.feedEnum.EventType;
 import ru.yandex.practicum.filmorate.model.feedEnum.OperationType;
+import ru.yandex.practicum.filmorate.storage.FeedStorage;
+
 import static ru.yandex.practicum.filmorate.model.feedEnum.EventType.*;
 
 import java.sql.PreparedStatement;
@@ -19,15 +22,15 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class FeedDbStorage {
+public class FeedDbStorage implements FeedStorage {
     private final JdbcTemplate jdbcTemplate;
 
     public Feed addLike(Long user_id, OperationType operation, Long film_id ){
         return add (Feed.builder()
                 .timestamp(new Timestamp(System.currentTimeMillis()).getTime())
                 .userId(user_id)
-                .eventType(LIKE.toString())
-                .operation(operation.toString())
+                .eventType(LIKE)
+                .operation(operation)
                 .entityId(film_id)
                 .build() );
     }
@@ -35,8 +38,8 @@ public class FeedDbStorage {
         return add ( Feed.builder()
                 .timestamp(new Timestamp(System.currentTimeMillis()).getTime())
                 .userId(user_id)
-                .eventType(REVIEW.toString())
-                .operation(operation.toString())
+                .eventType(REVIEW)
+                .operation(operation)
                 .entityId(review_id)
                 .build() );
     }
@@ -45,13 +48,13 @@ public class FeedDbStorage {
         return add (Feed.builder()
                 .timestamp(new Timestamp(System.currentTimeMillis()).getTime())
                 .userId(user_id)
-                .eventType(FRIEND.toString())
-                .operation(operation.toString())
+                .eventType(FRIEND)
+                .operation(operation)
                 .entityId(friend_id)
                 .build() );
     }
 
-    public Feed add (Feed feed){
+    public Feed add(Feed feed){
         final String sql = "INSERT INTO feed (event_time, user_id, event_type, operation, entity_id ) "
                 + "VALUES ( ?, ?, ?, ?, ? )";
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -59,15 +62,15 @@ public class FeedDbStorage {
             PreparedStatement stmt = connection.prepareStatement(sql, new String[]{"event_id"});
             stmt.setTimestamp(1, new Timestamp(feed.getTimestamp()) );
             stmt.setLong(2,feed.getUserId());
-            stmt.setString(3,feed.getEventType());
-            stmt.setString(4,feed.getOperation());
+            stmt.setString(3,feed.getEventType().toString());
+            stmt.setString(4,feed.getOperation().toString());
             stmt.setLong(5,feed.getEntityId());
             return stmt;
         },keyHolder);
         return feed;
     }
 
-    public List<Feed> get (Long user_id){
+    public List<Feed> get(Long user_id){
         final String sql = "SELECT * FROM feed WHERE user_id = ? ORDER BY event_time ASC";
         return jdbcTemplate.query(sql,this::mapRowToFeed, user_id);
     }
@@ -76,8 +79,8 @@ public class FeedDbStorage {
         return Feed.builder()
                 .timestamp(rs.getTimestamp("event_time").getTime())
                 .userId(rs.getLong("user_id"))
-                .eventType(rs.getString("event_type"))
-                .operation(rs.getString("operation"))
+                .eventType(EventType.valueOf(rs.getString("event_type")))
+                .operation(OperationType.valueOf(rs.getString("operation")))
                 .eventId(rs.getLong("event_id"))
                 .entityId(rs.getLong("entity_id"))
                 .build();

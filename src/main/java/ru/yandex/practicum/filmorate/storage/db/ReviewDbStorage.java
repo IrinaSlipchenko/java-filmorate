@@ -8,6 +8,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.AlreadyExistException;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.storage.ReviewStorage;
 
 
 import java.sql.PreparedStatement;
@@ -15,14 +16,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import static ru.yandex.practicum.filmorate.model.feedEnum.OperationType.*;
 
 @Component
 @RequiredArgsConstructor
-public class ReviewDbStorage {
+public class ReviewDbStorage implements ReviewStorage {
     private final JdbcTemplate jdbcTemplate;
     private final ReviewLikeDbStorage reviewLikeDbStorage;
-    private final  FeedDbStorage feedDbStorage;
+
 
     public Review add(Review review){
         final String sqlUserHaveReviewFilm = "SELECT * FROM reviews WHERE film_id = ? AND user_id = ?";
@@ -43,7 +43,6 @@ public class ReviewDbStorage {
         }, keyHolder);
         review.setReviewId(keyHolder.getKey().longValue());
         review.setUseful(reviewLikeDbStorage.getResultUseful(review.getReviewId()));
-        feedDbStorage.addReview(review.getUserId(),ADD,review.getReviewId());
         return review;
     }
 
@@ -55,15 +54,13 @@ public class ReviewDbStorage {
     public Review update(Review review){
         String sql = "UPDATE reviews SET content = ?, is_positive = ? WHERE review_id = ?";
         jdbcTemplate.update(sql,review.getContent(),review.getIsPositive(),review.getReviewId());
-        feedDbStorage.addReview(review.getUserId(),UPDATE,review.getReviewId());
         return get(review.getReviewId());
     }
 
-    public Review delete( Long reviewId ) {
+    public Review delete(Long reviewId) {
         Review review = get(reviewId);
         String sql = "DELETE FROM reviews WHERE review_id = ?";
         jdbcTemplate.update(sql,review.getReviewId());
-        feedDbStorage.addReview(review.getUserId(),REMOVE,review.getReviewId());
         return review;
     }
 

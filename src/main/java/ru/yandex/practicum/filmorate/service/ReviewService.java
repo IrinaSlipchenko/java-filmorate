@@ -12,6 +12,8 @@ import ru.yandex.practicum.filmorate.storage.db.UserDbStorage;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static ru.yandex.practicum.filmorate.model.feedEnum.OperationType.*;
+
 @Service
 @RequiredArgsConstructor
 public class ReviewService {
@@ -24,7 +26,9 @@ public class ReviewService {
     public Review add(Review review){
         userDbStorage.findUserById(review.getUserId());
         filmDbStorage.findFilmById(review.getFilmId());
-        return reviewDbStorage.add(review);
+        Review resultReview = reviewDbStorage.add(review);
+        feedDbStorage.addReview(review.getUserId(),ADD,review.getReviewId());
+        return resultReview;
     }
 
     public Review update(Review review){
@@ -34,7 +38,9 @@ public class ReviewService {
         }
         review.setFilmId(reviewDbStorage.get(review.getReviewId()).getFilmId());
         review.setUserId(reviewDbStorage.get(review.getReviewId()).getUserId());
-        return reviewDbStorage.update(review);
+        Review resultReview =  reviewDbStorage.update(review);
+        feedDbStorage.addReview(review.getUserId(),UPDATE,review.getReviewId());
+        return resultReview;
     }
 
     public Review get( Long reviewId){
@@ -48,7 +54,9 @@ public class ReviewService {
         if( !reviewDbStorage.containsIdReview(reviewId) ) {
             throw new NoSuchIdException("Отзыв по ID = " + reviewId + " не найден");
         }
-        return reviewDbStorage.delete(reviewId);
+        Review resultReview =  reviewDbStorage.delete(reviewId);
+        feedDbStorage.addReview(resultReview.getUserId(),REMOVE,resultReview.getReviewId());
+        return resultReview;
     }
 
     public List<Review> getAll(Long filmId, Integer count){
