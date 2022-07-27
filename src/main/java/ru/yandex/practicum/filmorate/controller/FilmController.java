@@ -4,8 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.SearchParam;
 import ru.yandex.practicum.filmorate.model.SortParam;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.FilmValidator;
 
@@ -16,7 +19,7 @@ import java.util.EnumSet;
 import java.util.List;
 
 /**
- *
+ * The class helps listen to user request at "/films"
  */
 @Slf4j
 @RestController
@@ -25,17 +28,18 @@ import java.util.List;
 public class FilmController {
 
     /**
-     *
+     * @see FilmService
      */
     private final FilmService filmService;
 
     /**
-     *
+     * @see FilmValidator
      */
     private final FilmValidator filmValidator;
 
     /**
-     * @return
+     * @return all films saved in storage at the current moment
+     * @see Film
      */
     @GetMapping
     public List<Film> findAll() {
@@ -43,8 +47,9 @@ public class FilmController {
     }
 
     /**
-     * @param id
-     * @return
+     * @param id the specified identifier for the film to be searched.
+     * @return the film saved in storage under specified identifier
+     * @see Film
      */
     @GetMapping("/{id}")
     public Film findFilm(@PathVariable("id") Long id) {
@@ -52,8 +57,9 @@ public class FilmController {
     }
 
     /**
-     * @param film
-     * @return
+     * @param film the json specified as film object with no identifier received to save in storage
+     * @return film specified with identifier and saved with given parameters in storage
+     * @see Film
      */
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
@@ -62,8 +68,9 @@ public class FilmController {
     }
 
     /**
-     * @param film
-     * @return
+     * @param film the json specified as film object with existing identifier received to save in storage
+     * @return film specified with identifier and saved with updated parameters in storage
+     * @see Film
      */
     @PutMapping
     public Film update(@Valid @RequestBody Film film) {
@@ -72,8 +79,9 @@ public class FilmController {
     }
 
     /**
-     * @param id
-     * @return
+     * @param id the specified identifier for the film to be deleted.
+     * @return film  and deleted from storage
+     * @see Film
      */
     @DeleteMapping("/{id}")
     public Film deleteFilmById(@PathVariable Long id) {
@@ -82,9 +90,11 @@ public class FilmController {
     }
 
     /**
-     * @param id
-     * @param userId
-     * @return
+     * @param id the identifier for the film to be liked by user.
+     * @param userId the identifier for the user who liked film
+     * @return film specified with identifier and saved with updated likes in storage
+     * @see Film
+     * @see User
      */
     @PutMapping("/{id}/like/{userId}")
     public Film likeFilm(@PathVariable Long id, @PathVariable Long userId) {
@@ -92,9 +102,11 @@ public class FilmController {
     }
 
     /**
-     * @param id
-     * @param userId
-     * @return
+     * @param id the identifier for the film, like for which to be deleted from storage.
+     * @param userId the identifier for the user who liked film
+     * @return film specified with identifier and saved with updated likes in storage
+     * @see Film
+     * @see User
      */
     @DeleteMapping("/{id}/like/{userId}")
     public Film deleteLikeFilm(@PathVariable Long id, @PathVariable Long userId) {
@@ -102,10 +114,12 @@ public class FilmController {
     }
 
     /**
-     * @param count
-     * @param genreId
-     * @param year
-     * @return
+     * @param count the count of films to be returned, if absent then count = 10
+     * @param genreId genre identifier, if present the method would return films of that genre, else: any
+     * @param year the number of year, if present the method would return films produced in that year, else: any
+     * @return the most popular films sorted ascending by user likes of specified genre and produced by in pointed year
+     * @see Film
+     * @see Genre
      */
     @GetMapping("/popular")
     public List<Film> getPopularFilms(@RequestParam(required = false, value = "count", defaultValue = "10") @Positive int count,
@@ -115,9 +129,11 @@ public class FilmController {
     }
 
     /**
-     * @param userId
-     * @param friendId
-     * @return
+     * @param userId the user identifier, whose liked films to be compared with other user to find common ones
+     * @param friendId the other user identifier, whose liked films to be compared with user to find common ones
+     * @return the common films liked by both users
+     * @see Film
+     * @see User
      */
     @GetMapping("/common")
     public List<Film> getCommonFilms(@RequestParam(value = "userId") Long userId
@@ -126,9 +142,11 @@ public class FilmController {
     }
 
     /**
-     * @param text
-     * @param searchParams
-     * @return
+     * @param text the substring searched in films parameters
+     * @param searchParams the searching parameters, could be identified as director name, film name (title)
+     * @return films relevant to the searched text in certain parameters
+     * @see Film
+     * @see SearchParam
      */
     @GetMapping("search")
     public List<Film> searchFilms(@RequestParam(value = "query") @NotBlank String text,
@@ -137,9 +155,13 @@ public class FilmController {
     }
 
     /**
-     * @param directorId
-     * @param sortBy
-     * @return
+     * @param directorId the director identifier the film of which to be returned
+     * @param sortBy sorting parameter for films returned, could be specified as likes or year
+     * @return the films of the specified director sorted by users likes or number of year of production
+     * @see Film
+     * @see Director
+     * @see User
+     * @see SortParam
      */
     @GetMapping("/director/{directorId}")
     public List<Film> getSortedFilmsByDirector(@PathVariable Long directorId,

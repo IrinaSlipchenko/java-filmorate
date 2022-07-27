@@ -15,8 +15,10 @@ import ru.yandex.practicum.filmorate.model.ErrorResponse;
 public class ErrorHandler {
 
     /**
-     * @param e
-     * @return
+     * @param e thrown UserNotFoundException
+     * @return response status and data as ErrorResponse json with specified error
+     * @see UserNotFoundException
+     * @see ErrorResponse
      */
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -25,8 +27,10 @@ public class ErrorHandler {
     }
 
     /**
-     * @param e
-     * @return
+     * @param e thrown FilmNotFoundException
+     * @return response status and data as ErrorResponse json with specified error
+     * @see FilmNotFoundException
+     * @see ErrorResponse
      */
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -35,8 +39,10 @@ public class ErrorHandler {
     }
 
     /**
-     * @param e
-     * @return
+     * @param e thrown DirectorNotFoundException
+     * @return response status and data as ErrorResponse json with specified error
+     * @see DirectorNotFoundException
+     * @see ErrorResponse
      */
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -45,8 +51,10 @@ public class ErrorHandler {
     }
 
     /**
-     * @param e
-     * @return
+     * @param e thrown ValidationException
+     * @return response status and data as ErrorResponse json with specified error
+     * @see ValidationException
+     * @see ErrorResponse
      */
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -55,8 +63,10 @@ public class ErrorHandler {
     }
 
     /**
-     * @param e
-     * @return
+     * @param e thrown MethodArgumentNotValidException
+     * @return response status and data as ErrorResponse json with specified error
+     * @see MethodArgumentNotValidException
+     * @see ErrorResponse
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -66,8 +76,10 @@ public class ErrorHandler {
     }
 
     /**
-     * @param e
-     * @return
+     * @param e thrown NoSuchIdException
+     * @return response status and data as ErrorResponse json with specified error
+     * @see NoSuchIdException
+     * @see ErrorResponse
      */
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -76,8 +88,10 @@ public class ErrorHandler {
     }
 
     /**
-     * @param e
-     * @return
+     * @param e thrown NoSuchReactFind
+     * @return response status and data as ErrorResponse json with specified error
+     * @see NoSuchReactFind
+     * @see ErrorResponse
      */
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -86,8 +100,10 @@ public class ErrorHandler {
     }
 
     /**
-     * @param e
-     * @return
+     * @param e thrown AlreadyExistException
+     * @return response status and data as ErrorResponse json with specified error
+     * @see AlreadyExistException
+     * @see ErrorResponse
      */
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
