@@ -86,6 +86,11 @@ public class UserDbStorage implements UserStorage {
         return jdbcTemplate.query(sql, this::mapRowToUser, id);
     }
 
+    public Boolean containsIdUser(Long userId) {
+        final String sql = "SELECT user_id FROM users WHERE user_id = ?";
+        return jdbcTemplate.queryForList(sql, userId).size() > 0;
+    }
+
     private User mapRowToUser(ResultSet rs, int i) throws SQLException {
         ResultSetMetaData rsmd = rs.getMetaData();
         Set<Long> fr = new HashSet<>();

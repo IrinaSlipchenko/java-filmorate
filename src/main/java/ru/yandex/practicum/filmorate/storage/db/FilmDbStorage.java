@@ -166,6 +166,11 @@ public class FilmDbStorage implements FilmStorage {
                 jdbcTemplate.query(sqlSearchByFilmTitle, this::mapRowToFilm, text);
     }
 
+    public Boolean containsIdFilm(Long filmId) {
+        final String sql = "SELECT film_id FROM films WHERE film_id = ?";
+        return jdbcTemplate.queryForList(sql, filmId).size() > 0;
+    }
+
     private Film mapRowToFilm(ResultSet rs, int i) throws SQLException {
         Mpa mpa = Mpa.builder()
                 .id(rs.getInt("rating_mpa_id"))

@@ -19,60 +19,60 @@ import java.sql.Timestamp;
 import java.util.List;
 
 
-
 @Component
 @RequiredArgsConstructor
 public class FeedDbStorage implements FeedStorage {
     private final JdbcTemplate jdbcTemplate;
 
-    public Feed addLike(Long user_id, OperationType operation, Long film_id ){
-        return add (Feed.builder()
+    public Feed addLike(Long userId, OperationType operation, Long filmId) {
+        return add(Feed.builder()
                 .timestamp(new Timestamp(System.currentTimeMillis()).getTime())
-                .userId(user_id)
+                .userId(userId)
                 .eventType(LIKE)
                 .operation(operation)
-                .entityId(film_id)
-                .build() );
+                .entityId(filmId)
+                .build());
     }
-    public Feed addReview(Long user_id, OperationType operation, Long review_id ){
-        return add ( Feed.builder()
+
+    public Feed addReview(Long userId, OperationType operation, Long reviewId) {
+        return add(Feed.builder()
                 .timestamp(new Timestamp(System.currentTimeMillis()).getTime())
-                .userId(user_id)
+                .userId(userId)
                 .eventType(REVIEW)
                 .operation(operation)
-                .entityId(review_id)
-                .build() );
+                .entityId(reviewId)
+                .build());
     }
 
-    public Feed addFriend(Long user_id, OperationType operation, Long friend_id ){
-        return add (Feed.builder()
+    public Feed addFriend(Long userId, OperationType operation, Long friendId) {
+        return add(Feed.builder()
                 .timestamp(new Timestamp(System.currentTimeMillis()).getTime())
-                .userId(user_id)
+                .userId(userId)
                 .eventType(FRIEND)
                 .operation(operation)
-                .entityId(friend_id)
-                .build() );
+                .entityId(friendId)
+                .build());
     }
 
-    public Feed add(Feed feed){
+    public Feed add(Feed feed) {
         final String sql = "INSERT INTO feed (event_time, user_id, event_type, operation, entity_id ) "
                 + "VALUES ( ?, ?, ?, ?, ? )";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement stmt = connection.prepareStatement(sql, new String[]{"event_id"});
-            stmt.setTimestamp(1, new Timestamp(feed.getTimestamp()) );
-            stmt.setLong(2,feed.getUserId());
-            stmt.setString(3,feed.getEventType().toString());
-            stmt.setString(4,feed.getOperation().toString());
-            stmt.setLong(5,feed.getEntityId());
+            stmt.setTimestamp(1, new Timestamp(feed.getTimestamp()));
+            stmt.setLong(2, feed.getUserId());
+            stmt.setString(3, feed.getEventType().toString());
+            stmt.setString(4, feed.getOperation().toString());
+            stmt.setLong(5, feed.getEntityId());
             return stmt;
-        },keyHolder);
+        }, keyHolder);
         return feed;
     }
 
-    public List<Feed> get(Long user_id){
+    public List<Feed> get(Long user_id) {
         final String sql = "SELECT * FROM feed WHERE user_id = ? ORDER BY event_time ASC";
-        return jdbcTemplate.query(sql,this::mapRowToFeed, user_id);
+        return jdbcTemplate.query(sql, this::mapRowToFeed, user_id);
     }
 
     private Feed mapRowToFeed(ResultSet rs, int rowNum) throws SQLException {

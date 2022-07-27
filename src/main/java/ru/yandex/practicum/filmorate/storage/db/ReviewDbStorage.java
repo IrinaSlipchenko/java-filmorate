@@ -24,9 +24,9 @@ public class ReviewDbStorage implements ReviewStorage {
     private final ReviewLikeDbStorage reviewLikeDbStorage;
 
 
-    public Review add(Review review){
+    public Review add(Review review) {
         final String sqlUserHaveReviewFilm = "SELECT * FROM reviews WHERE film_id = ? AND user_id = ?";
-        if( jdbcTemplate.queryForList(sqlUserHaveReviewFilm,review.getFilmId(),review.getUserId()).size() > 0){
+        if (jdbcTemplate.queryForList(sqlUserHaveReviewFilm, review.getFilmId(), review.getUserId()).size() > 0) {
             throw new AlreadyExistException("Пользователь с ID = "
                     + review.getUserId() + " уже оставлял отзыв на фильм ID = " + review.getFilmId());
         }
@@ -35,10 +35,10 @@ public class ReviewDbStorage implements ReviewStorage {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement stmt = connection.prepareStatement(sql, new String[]{"review_id"});
-            stmt.setString(1, review.getContent() );
+            stmt.setString(1, review.getContent());
             stmt.setBoolean(2, review.getIsPositive());
-            stmt.setLong(3,review.getUserId());
-            stmt.setLong(4,review.getFilmId());
+            stmt.setLong(3, review.getUserId());
+            stmt.setLong(4, review.getFilmId());
             return stmt;
         }, keyHolder);
         review.setReviewId(keyHolder.getKey().longValue());
@@ -46,25 +46,25 @@ public class ReviewDbStorage implements ReviewStorage {
         return review;
     }
 
-    public Review get(Long reviewId){
+    public Review get(Long reviewId) {
         final String sql = "SELECT * FROM reviews WHERE review_id = ?";
         return jdbcTemplate.queryForObject(sql, this::mapRowToReview, reviewId);
     }
 
-    public Review update(Review review){
+    public Review update(Review review) {
         String sql = "UPDATE reviews SET content = ?, is_positive = ? WHERE review_id = ?";
-        jdbcTemplate.update(sql,review.getContent(),review.getIsPositive(),review.getReviewId());
+        jdbcTemplate.update(sql, review.getContent(), review.getIsPositive(), review.getReviewId());
         return get(review.getReviewId());
     }
 
     public Review delete(Long reviewId) {
         Review review = get(reviewId);
         String sql = "DELETE FROM reviews WHERE review_id = ?";
-        jdbcTemplate.update(sql,review.getReviewId());
+        jdbcTemplate.update(sql, review.getReviewId());
         return review;
     }
 
-    public List<Long> getAllByFilmId (Long filmId, Integer count){
+    public List<Long> getAllByFilmId(Long filmId, Integer count) {
         final String sql = "SELECT r.review_id, "
                 + " SUM( CASE WHEN  rl.is_useful IS NULL THEN  0 ELSE CASE WHEN  rl.is_useful THEN  1 ELSE -1 END END) "
                 + " AS uset "
@@ -74,11 +74,11 @@ public class ReviewDbStorage implements ReviewStorage {
                 + " GROUP BY r.review_id "
                 + " ORDER BY uset DESC "
                 + "LIMIT ?";
-        return jdbcTemplate.query(sql,(rs, rowNum) -> rs.getLong("review_id"),filmId, count);
+        return jdbcTemplate.query(sql, (rs, rowNum) -> rs.getLong("review_id"), filmId, count);
 
     }
 
-    public List<Long> getAll (Integer count){
+    public List<Long> getAll(Integer count) {
         final String sql = "SELECT r.review_id, "
                 + " SUM( CASE WHEN  rl.is_useful IS NULL THEN  0 ELSE CASE WHEN  rl.is_useful THEN  1 ELSE -1 END END) "
                 + " AS uset "
@@ -87,24 +87,24 @@ public class ReviewDbStorage implements ReviewStorage {
                 + " GROUP BY (r.review_id) "
                 + " ORDER BY uset DESC "
                 + " LIMIT ?";
-        return jdbcTemplate.query(sql,(rs, rowNum) -> rs.getLong("review_id"), count);
+        return jdbcTemplate.query(sql, (rs, rowNum) -> rs.getLong("review_id"), count);
     }
 
-    public Boolean containsIdReview(Long reviewId){
+    public Boolean containsIdReview(Long reviewId) {
         final String sql = "SELECT review_id FROM reviews WHERE review_id = ?";
-        return jdbcTemplate.queryForList(sql, reviewId).size()>0;
+        return jdbcTemplate.queryForList(sql, reviewId).size() > 0;
     }
 
-    public Boolean addReaction(Long id, Long userId,Boolean isUseful){
+    public Boolean addReaction(Long id, Long userId, Boolean isUseful) {
         return reviewLikeDbStorage.addReaction(id, userId, isUseful);
     }
 
-    public Boolean deleteReaction (Long id, Long userId, Boolean isUseful) {
-        return reviewLikeDbStorage.deleteReaction(id,userId,isUseful);
+    public Boolean deleteReaction(Long id, Long userId, Boolean isUseful) {
+        return reviewLikeDbStorage.deleteReaction(id, userId, isUseful);
     }
 
     private Review mapRowToReview(ResultSet rs, int rowNum) throws SQLException {
-        Review review =  Review.builder()
+        Review review = Review.builder()
                 .reviewId(rs.getLong("review_id"))
                 .content(rs.getString("content"))
                 .isPositive(rs.getBoolean("is_positive"))
