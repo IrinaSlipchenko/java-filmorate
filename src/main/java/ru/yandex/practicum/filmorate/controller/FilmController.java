@@ -47,7 +47,7 @@ public class FilmController {
     }
 
     /**
-     * @param id the specified identifier for the film to be searched.
+     * @param id the specified identifier for the film to be searched
      * @return the film saved in storage under specified identifier
      * @see Film
      */
@@ -79,8 +79,8 @@ public class FilmController {
     }
 
     /**
-     * @param id the specified identifier for the film to be deleted.
-     * @return film  and deleted from storage
+     * @param id the specified identifier for the film to be deleted
+     * @return film specified with identifier and deleted from storage
      * @see Film
      */
     @DeleteMapping("/{id}")
@@ -90,7 +90,7 @@ public class FilmController {
     }
 
     /**
-     * @param id the identifier for the film to be liked by user.
+     * @param id     the identifier for the film to be liked by user
      * @param userId the identifier for the user who liked film
      * @return film specified with identifier and saved with updated likes in storage
      * @see Film
@@ -102,7 +102,7 @@ public class FilmController {
     }
 
     /**
-     * @param id the identifier for the film, like for which to be deleted from storage.
+     * @param id     the identifier for the film, like for which to be deleted from storage
      * @param userId the identifier for the user who liked film
      * @return film specified with identifier and saved with updated likes in storage
      * @see Film
@@ -114,22 +114,23 @@ public class FilmController {
     }
 
     /**
-     * @param count the count of films to be returned, if absent then count = 10
+     * @param count   the number of films to be returned, if absent then count = 10
      * @param genreId genre identifier, if present the method would return films of that genre, else: any
-     * @param year the number of year, if present the method would return films produced in that year, else: any
+     * @param year    the number of year, if present the method would return films produced in that year, else: any
      * @return the most popular films sorted ascending by user likes of specified genre and produced by in pointed year
      * @see Film
      * @see Genre
      */
     @GetMapping("/popular")
-    public List<Film> getPopularFilms(@RequestParam(required = false, value = "count", defaultValue = "10") @Positive int count,
-                                      @RequestParam(required = false, value = "genreId") Integer genreId,
-                                      @RequestParam(required = false, value = "year") Integer year) {
+    public List<Film> getPopularFilms(
+            @RequestParam(required = false, value = "count", defaultValue = "10") @Positive int count,
+            @RequestParam(required = false, value = "genreId") Integer genreId,
+            @RequestParam(required = false, value = "year") Integer year) {
         return filmService.getPopularFilms(count, genreId, year);
     }
 
     /**
-     * @param userId the user identifier, whose liked films to be compared with other user to find common ones
+     * @param userId   the user identifier, whose liked films to be compared with other user to find common ones
      * @param friendId the other user identifier, whose liked films to be compared with user to find common ones
      * @return the common films liked by both users
      * @see Film
@@ -142,7 +143,7 @@ public class FilmController {
     }
 
     /**
-     * @param text the substring searched in films parameters
+     * @param text         the substring searched in films parameters
      * @param searchParams the searching parameters, could be identified as director name, film name (title)
      * @return films relevant to the searched text in certain parameters
      * @see Film
@@ -156,7 +157,7 @@ public class FilmController {
 
     /**
      * @param directorId the director identifier the film of which to be returned
-     * @param sortBy sorting parameter for films returned, could be specified as likes or year
+     * @param sortBy     sorting parameter for films returned, could be specified as likes or year
      * @return the films of the specified director sorted by users likes or number of year of production
      * @see Film
      * @see Director
@@ -168,4 +169,5 @@ public class FilmController {
                                                @RequestParam(value = "sortBy") SortParam sortBy) {
         return filmService.getSortedFilmsByDirector(directorId, sortBy);
     }
+
 }
