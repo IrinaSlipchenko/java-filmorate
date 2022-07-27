@@ -18,8 +18,8 @@ public class FriendsStorage {
         user.getFriends().forEach(fId -> jdbcTemplate.update(sql2, user.getId(), fId));
     }
 
-    public Boolean containsFriend(Long id, Long friendId){
+    public Boolean containsFriend(Long id, Long friendId) {
         String sql = "SELECT user_id FROM friends WHERE user_id = ? AND friend_id = ?";
-        return jdbcTemplate.queryForList(sql, id, friendId).size()>0;
+        return jdbcTemplate.queryForList(sql, id, friendId).size() > 0;
     }
 }

@@ -30,8 +30,8 @@ public class LikesDbStorage {
         return new HashSet<>(jdbcTemplate.query(sql, (rs, i) -> rs.getLong("user_id"), id));
     }
 
-    public Boolean containsLike (Long id, Long userId){
+    public Boolean containsLike(Long id, Long userId) {
         String sql = "SELECT user_id FROM film_likes WHERE film_id = ? AND user_id = ?";
-        return jdbcTemplate.queryForList(sql, id, userId).size()>0;
+        return jdbcTemplate.queryForList(sql, id, userId).size() > 0;
     }
 }

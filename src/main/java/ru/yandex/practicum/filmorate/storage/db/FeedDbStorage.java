@@ -70,9 +70,9 @@ public class FeedDbStorage implements FeedStorage {
         return feed;
     }
 
-    public List<Feed> get(Long user_id) {
+    public List<Feed> get(Long userId) {
         final String sql = "SELECT * FROM feed WHERE user_id = ? ORDER BY event_time ASC";
-        return jdbcTemplate.query(sql, this::mapRowToFeed, user_id);
+        return jdbcTemplate.query(sql, this::mapRowToFeed, userId);
     }
 
     private Feed mapRowToFeed(ResultSet rs, int rowNum) throws SQLException {

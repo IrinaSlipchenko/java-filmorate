@@ -46,12 +46,13 @@ class ReviewTest {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
     }
+
     @BeforeEach
     void configFilmUserAndReview() {
         film = Film.builder()
                 .name("Film_Name")
                 .description("Film_description")
-                .releaseDate(LocalDate.of(1990,02,05))
+                .releaseDate(LocalDate.of(1990, 02, 05))
                 .duration(100)
                 .mpa(Mpa.builder().id(1).name("G").build())
                 .genres(new TreeSet<>(Collections.singleton(Genre.builder().id(1).name("Комедия").build())))
@@ -60,7 +61,7 @@ class ReviewTest {
                 .email("name@email.com")
                 .login("login")
                 .name("name")
-                .birthday(LocalDate.of(1900,10,05))
+                .birthday(LocalDate.of(1900, 10, 05))
                 .build();
         review = Review.builder()
                 .content("New Review")
@@ -69,26 +70,26 @@ class ReviewTest {
     }
 
     @AfterEach
-    void clean(){
+    void clean() {
         violations = null;
         List<String> sql = Arrays.asList("DELETE FROM films"
                 , "DELETE FROM users"
                 , "DELETE FROM reviews"
-                ,"ALTER TABLE films ALTER COLUMN film_id RESTART WITH 1"
-                ,"ALTER TABLE users ALTER COLUMN user_id RESTART WITH 1"
-                ,"ALTER TABLE reviews ALTER COLUMN review_id RESTART WITH 1");
+                , "ALTER TABLE films ALTER COLUMN film_id RESTART WITH 1"
+                , "ALTER TABLE users ALTER COLUMN user_id RESTART WITH 1"
+                , "ALTER TABLE reviews ALTER COLUMN review_id RESTART WITH 1");
         sql.forEach(jdbcTemplate::update);
     }
 
     @Test
-    void shouldNotValidReviewIfContentIsBlank(){
+    void shouldNotValidReviewIfContentIsBlank() {
         review.setFilmId(filmStorage.create(film).getId());
         review.setUserId(userStorage.create(user).getId());
         review.setContent("");
         violations = validator.validate(review);
         assertAll(
-                ()->assertEquals(1,violations.size()),
-                ()->assertEquals("Отсутсвует текст отзыва.",violations.iterator().next().getMessage())
+                () -> assertEquals(1, violations.size()),
+                () -> assertEquals("Отсутсвует текст отзыва.", violations.iterator().next().getMessage())
         );
     }
 
@@ -105,28 +106,28 @@ class ReviewTest {
     }
 
     @Test
-    void shouldNotValidateReviewWithNullOrNotExistIdUser(){
+    void shouldNotValidateReviewWithNullOrNotExistIdUser() {
         review.setFilmId(filmStorage.create(film).getId());
         review.setUserId(null);
         violations = validator.validate(review);
         assertAll(
-                ()->assertEquals(1,violations.size()),
-                ()->assertEquals("Отсутсвует ID пользователя, создавший отзыв."
-                        ,violations.iterator().next().getMessage())
+                () -> assertEquals(1, violations.size()),
+                () -> assertEquals("Отсутсвует ID пользователя, создавший отзыв."
+                        , violations.iterator().next().getMessage())
         );
         review.setUserId(100l);
         assertThrows(UserNotFoundException.class, () -> reviewController.addReview(review));
     }
 
     @Test
-    void shouldNotValidateReviewWithNullOrNotExistIdFilm(){
+    void shouldNotValidateReviewWithNullOrNotExistIdFilm() {
         review.setFilmId(null);
         review.setUserId(userStorage.create(user).getId());
         violations = validator.validate(review);
         assertAll(
-                ()->assertEquals(1,violations.size()),
-                ()->assertEquals("Отсутствует ID фильма, на который написан отзыв."
-                        ,violations.iterator().next().getMessage())
+                () -> assertEquals(1, violations.size()),
+                () -> assertEquals("Отсутствует ID фильма, на который написан отзыв."
+                        , violations.iterator().next().getMessage())
         );
         review.setFilmId(100l);
         assertThrows(FilmNotFoundException.class, () -> reviewController.addReview(review));

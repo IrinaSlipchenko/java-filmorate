@@ -9,14 +9,14 @@ import javax.validation.constraints.NotNull;
 @Data
 @Builder
 public class Review {
-     private Long reviewId;
-     @NotBlank(message = "Отсутсвует текст отзыва.")
-     private String content;
-     @NotNull(message = "Отсутствует тип отзыва : положительный или негативный.")
-     private Boolean isPositive;
-     @NotNull(message = "Отсутсвует ID пользователя, создавший отзыв.")
-     private Long userId;
-     @NotNull(message = "Отсутствует ID фильма, на который написан отзыв.")
-     private Long filmId;
-     private Integer useful;
+    private Long reviewId;
+    @NotBlank(message = "Отсутсвует текст отзыва.")
+    private String content;
+    @NotNull(message = "Отсутствует тип отзыва : положительный или негативный.")
+    private Boolean isPositive;
+    @NotNull(message = "Отсутсвует ID пользователя, создавший отзыв.")
+    private Long userId;
+    @NotNull(message = "Отсутствует ID фильма, на который написан отзыв.")
+    private Long filmId;
+    private Integer useful;
 }
