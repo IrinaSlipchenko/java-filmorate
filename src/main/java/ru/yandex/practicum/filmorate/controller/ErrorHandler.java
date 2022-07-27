@@ -8,33 +8,56 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.ErrorResponse;
 
+/**
+ * The class helps to handle program exceptions and send info to user as error response with specified data and status
+ */
 @RestControllerAdvice
 public class ErrorHandler {
 
+    /**
+     * @param e
+     * @return
+     */
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleUserNotFoundException(final UserNotFoundException e) {
         return new ErrorResponse(e.getMessage());
     }
 
+    /**
+     * @param e
+     * @return
+     */
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleFilmNotFoundException(final FilmNotFoundException e) {
         return new ErrorResponse(e.getMessage());
     }
 
+    /**
+     * @param e
+     * @return
+     */
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleDirectorNotFoundException(final DirectorNotFoundException e) {
         return new ErrorResponse(e.getMessage());
     }
 
+    /**
+     * @param e
+     * @return
+     */
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidationException(final ValidationException e) {
         return new ErrorResponse(e.getMessage());
     }
 
+    /**
+     * @param e
+     * @return
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleMethodArgumentNotValidException(
@@ -42,18 +65,30 @@ public class ErrorHandler {
         return new ErrorResponse(e.getFieldError().getDefaultMessage());
     }
 
+    /**
+     * @param e
+     * @return
+     */
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNoSuchIdException(final NoSuchIdException e) {
         return new ErrorResponse(e.getMessage());
     }
 
+    /**
+     * @param e
+     * @return
+     */
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNoSuchReactFind(final NoSuchReactFind e) {
         return new ErrorResponse(e.getMessage());
     }
 
+    /**
+     * @param e
+     * @return
+     */
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleAlreadyExistException(final AlreadyExistException e) {

@@ -9,13 +9,25 @@ import ru.yandex.practicum.filmorate.service.ReviewService;
 import javax.validation.Valid;
 import java.util.List;
 
+/**
+ *
+ */
 @RestController
 @RequestMapping("/reviews")
 @RequiredArgsConstructor
 public class ReviewController {
+
+    /**
+     * @see ReviewService
+     */
     private final ReviewService reviewService;
 
-    //Добавление нового отзыва.
+    /**
+     * Добавление нового отзыва.
+     *
+     * @param review
+     * @return
+     */
     @PostMapping
     public Review addReview(@Valid @RequestBody Review review) {
         return reviewService.add(review);
