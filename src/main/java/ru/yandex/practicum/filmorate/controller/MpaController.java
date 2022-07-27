@@ -11,7 +11,7 @@ import ru.yandex.practicum.filmorate.service.MpaService;
 import java.util.List;
 
 /**
- *
+ * The class helps listen to user request at "/mpa"
  */
 @RestController
 @RequestMapping("/mpa")
@@ -19,12 +19,13 @@ import java.util.List;
 public class MpaController {
 
     /**
-     *
+     * @see MpaService
      */
     private final MpaService mpaService;
 
     /**
-     * @return
+     * @return all MPA ratings saved in storage at the current moment
+     * @see Mpa
      */
     @GetMapping
     public List<Mpa> findAll() {
@@ -32,8 +33,9 @@ public class MpaController {
     }
 
     /**
-     * @param id
-     * @return
+     * @param id the specified identifier for the MPA rating to be searched.
+     * @return the MPA rating saved in storage under specified identifier
+     * @see Mpa
      */
     @GetMapping("/{id}")
     public Mpa findMpa(@PathVariable("id") Long id) {
