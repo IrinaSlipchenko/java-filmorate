@@ -60,6 +60,7 @@ public class FilmController {
      * @param film the json specified as film object with no identifier received to save in storage
      * @return film specified with identifier and saved with given parameters in storage
      * @see Film
+     * @see FilmValidator
      */
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
@@ -71,6 +72,7 @@ public class FilmController {
      * @param film the json specified as film object with existing identifier received to save in storage
      * @return film specified with identifier and saved with updated parameters in storage
      * @see Film
+     * @see FilmValidator
      */
     @PutMapping
     public Film update(@Valid @RequestBody Film film) {
