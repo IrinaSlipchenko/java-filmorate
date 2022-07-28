@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import static ru.yandex.practicum.filmorate.model.feedEnum.OperationType.*;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -79,5 +80,9 @@ public class UserService {
     public List<Feed> feed(Long id){
         userStorage.findUserById(id);
         return feedDbStorage.get(id);
+    }
+
+    public List<Film> recommendations (Long id) {
+        return userStorage.recommendations(id);
     }
 }
