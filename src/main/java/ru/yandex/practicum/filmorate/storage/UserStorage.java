@@ -16,4 +16,6 @@ public interface UserStorage {
     User deleteUserById(Long userId);
 
     List<User> allMyFriends(Long id);
+
+    Boolean containsIdUser(Long userId);
 }

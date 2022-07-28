@@ -54,6 +54,8 @@ public class InMemoryUserStorage implements UserStorage {
         return null;
     }
 
+    public Boolean containsIdUser(Long userId) {return true;}
+
     private long nextID() {
         return ++id;
     }
