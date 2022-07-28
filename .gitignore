@@ -44,3 +44,5 @@ build/
 
 ##BD##
 db/
+
+*.DS_Store
