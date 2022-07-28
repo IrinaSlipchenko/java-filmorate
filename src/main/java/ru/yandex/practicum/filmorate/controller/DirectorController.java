@@ -40,7 +40,6 @@ public class DirectorController {
         return directorService.findDirectorById(id);
     }
 
-
     /**
      * @param director the json specified as director object with no identifier received to save in storage
      * @return director specified with identifier and saved with given parameters in storage
