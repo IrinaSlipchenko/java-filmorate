@@ -2,20 +2,16 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.exception.NoSuchIdException;
 import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
-import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.model.User;
 import static ru.yandex.practicum.filmorate.model.feedEnum.OperationType.*;
 
-import ru.yandex.practicum.filmorate.storage.FeedStorage;
+
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.storage.db.FeedDbStorage;
 import ru.yandex.practicum.filmorate.storage.db.FriendsStorage;
-import ru.yandex.practicum.filmorate.storage.db.ReviewDbStorage;
-import ru.yandex.practicum.filmorate.storage.db.ReviewLikeDbStorage;
+
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -44,7 +40,8 @@ public class UserService {
      * Find and returns all users in the storage
      *
      * @return a List or users as Users objects which contains in storage
-     * @see User,UserStorage
+     * @see User
+     * @see UserStorage
      */
     public List<User> findAll() {
         return userStorage.findAll();
@@ -55,7 +52,8 @@ public class UserService {
      *
      * @param user the specified as User object without identifier to be saved in the storage
      * @return the user as User object saved in storage with unique identifier
-     * @see User,UserStorage
+     * @see User
+     * @see UserStorage
      */
     public User create(User user) {
         return userStorage.create(user);
@@ -66,7 +64,8 @@ public class UserService {
      *
      * @param user the specified as User object with identifier to be updated in the storage
      * @return the user as User object updated in the storage
-     * @see User,UserStorage
+     * @see User
+     * @see UserStorage
      */
     public User update(User user) {
         return userStorage.update(user);
@@ -77,7 +76,8 @@ public class UserService {
      *
      * @param userID the specified as identifier of user to get from the storage
      * @return the user as User object saved in storage with identifier equals userID
-     * @see User,UserStorage
+     * @see User
+     * @see UserStorage
      */
     public User findUserById(Long userID) {
         return userStorage.findUserById(userID);
@@ -88,7 +88,8 @@ public class UserService {
      *
      * @param userID the specified as identifier of user to remove from the storage
      * @return the user as User object removed from storage with identifier equals userId
-     * @see User,UserStorage
+     * @see User
+     * @see UserStorage
      */
     public User deleteUserById(Long userID) {
         return userStorage.deleteUserById(userID);
@@ -100,7 +101,9 @@ public class UserService {
      * @param id the specified as identifier of user, which want to add a friend
      * @param friendId the specified as identifier of user, which added to the friends of user
      * @return the user as User object from storage with identifier equals id
-     * @see User, UserStorage, FeedStorage
+     * @see User
+     * @see UserStorage
+     * @see FeedDbStorage
      */
     public User friendAdd(Long id, Long friendId) {
         User user = userStorage.findUserById(id);
@@ -120,7 +123,9 @@ public class UserService {
      * @param id the specified as identifier of user, which want to delete a friend
      * @param friendId the specified as identifier of user, which deleted from the friends of user
      * @return the user as User object from storage with identifier equals id
-     * @see User, UserStorage, FeedStorage
+     * @see User,
+     * @see UserStorage
+     * @see FeedDbStorage
      */
     public User friendDelete(Long id, Long friendId) {
         User user = userStorage.findUserById(id);
@@ -135,9 +140,10 @@ public class UserService {
      * Returns all friends of user.
      *
      * @param id the specified as identifier of user
-     * @return a List containing the friends as Friend Objects
+     * @return a List containing the friends as User Objects
      * @throws UserNotFoundException if the user not found in the storage by ID
-     * @see User, UserStorage
+     * @see User
+     * @see UserStorage
      */
     public List<User> allMyFriends(Long id) {
         User user = userStorage.findUserById(id);
@@ -152,7 +158,7 @@ public class UserService {
      *
      * @param id the specified as identifier of first user
      * @param otherId the specified as identifier of second user
-     * @return a List containing the common friends as Friend Objects
+     * @return a List containing the common friends as User Objects
      * @see User
      */
     public List<User> commonFriends(Long id, Long otherId) {
