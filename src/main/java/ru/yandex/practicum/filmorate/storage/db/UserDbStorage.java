@@ -132,12 +132,12 @@ public class UserDbStorage implements UserStorage {
         Map<Long, Set<Long>> likes = new HashMap<>();
         jdbcTemplate.query("SELECT FILM_ID, USER_ID FROM FILM_LIKES",
                 (rs, rowNum) -> {
-                    Long filmId = rs.getLong("FILM_ID");
                     Long userId = rs.getLong("USER_ID");
-                    if (!likes.containsKey(filmId)) {
-                        likes.put(filmId, new HashSet<>());
+                    Long filmId = rs.getLong("FILM_ID");
+                    if (!likes.containsKey(userId)) {
+                        likes.put(userId, new HashSet<>());
                     }
-                    likes.get(filmId).add(userId);
+                    likes.get(userId).add(filmId);
                     return null;
                 });
         return likes;
