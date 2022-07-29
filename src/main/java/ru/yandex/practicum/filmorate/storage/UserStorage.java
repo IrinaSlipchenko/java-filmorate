@@ -18,5 +18,7 @@ public interface UserStorage {
 
     List<User> allMyFriends(Long id);
 
+    Boolean containsIdUser(Long userId);
+
     List<Film> recommendations (Long id);
 }

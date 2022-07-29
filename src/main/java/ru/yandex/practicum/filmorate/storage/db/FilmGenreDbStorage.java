@@ -9,6 +9,12 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+/**
+ * Class is provides database functionalities for films and genres.
+ *
+ * @see GenreDbStorage
+ * @see JdbcTemplate
+ */
 @Component
 @RequiredArgsConstructor
 public class FilmGenreDbStorage {
@@ -16,6 +22,12 @@ public class FilmGenreDbStorage {
     private final GenreDbStorage genreDbStorage;
     private final JdbcTemplate jdbcTemplate;
 
+    /**
+     * Updates the genres of the film
+     *
+     * @param film the movie for which we want to update the genres
+     * @see Film
+     */
     public void updateGenres(Film film) {
         if (film.getGenres() == null) {
             film.setGenres(new TreeSet<>());
@@ -28,6 +40,13 @@ public class FilmGenreDbStorage {
                 .forEach(id -> jdbcTemplate.update(sql2, film.getId(), id));
     }
 
+    /**
+     * Will return all genres that belong to the given movie
+     *
+     * @param id of the movie for which we want to find all its genres
+     * @return SortedSet of Genre
+     * @see Genre
+     */
     public SortedSet<Genre> getGenresByFilmId(Long id) {
         String sql = "SELECT GENRES.* FROM FILM_GENRE " +
                 "LEFT JOIN GENRES ON FILM_GENRE.GENRE_ID = GENRES.GENRE_ID WHERE film_id=?";

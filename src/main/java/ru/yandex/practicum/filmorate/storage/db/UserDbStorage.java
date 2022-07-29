@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
+import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
@@ -21,21 +22,43 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.*;
 
+/**
+ * Class is provides database functionalities for users.
+ */
 @Component
 @Primary
 @RequiredArgsConstructor
 public class UserDbStorage implements UserStorage {
+    /**
+     * @see JdbcTemplate
+     */
     private final JdbcTemplate jdbcTemplate;
 
+    /**
+     * @see FriendsStorage
+     */
     private final FriendsStorage friendsStorage;
     private final FilmStorage filmStorage;
 
+    /**
+     * Find and returns all users in the storage
+     *
+     * @return a List or users as Users objects which contains in storage
+     * @see User
+     */
     @Override
     public List<User> findAll() {
         String sql = "SELECT * FROM USERS";
         return jdbcTemplate.query(sql, this::mapRowToUser);
     }
 
+    /**
+     * Add user to storage
+     *
+     * @param user the specified as User object without identifier to be saved in the storage
+     * @return the user as User object saved in storage with unique identifier
+     * @see User
+     */
     @Override
     public User create(User user) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
@@ -50,6 +73,14 @@ public class UserDbStorage implements UserStorage {
         return user;
     }
 
+    /**
+     * Update user data in the storage
+     *
+     * @param user the specified as User object with identifier to be updated in the storage
+     * @return the user as User object updated in the storage
+     * @see User
+     * @see UserStorage
+     */
     @Override
     public User update(User user) {
         findUserById(user.getId());
@@ -62,6 +93,14 @@ public class UserDbStorage implements UserStorage {
         return user;
     }
 
+    /**
+     * Find and return user data from the storage
+     *
+     * @param userId the specified as identifier of user to get from the storage
+     * @return the user as User object saved in storage with identifier equals userID
+     * @throws UserNotFoundException if user not found by ib
+     * @see User
+     */
     @Override
     public User findUserById(Long userId) {
         String sql = "SELECT U.*, F.friend_id FROM USERS AS U\n" +
@@ -74,6 +113,13 @@ public class UserDbStorage implements UserStorage {
         }
     }
 
+    /**
+     * Delete user from the storage
+     *
+     * @param userId the specified as identifier of user to remove from the storage
+     * @return the user as User object removed from storage with identifier equals userId
+     * @see User
+     */
     @Override
     public User deleteUserById(Long userId) {
         User user = findUserById(userId);
@@ -82,6 +128,13 @@ public class UserDbStorage implements UserStorage {
         return user;
     }
 
+    /**
+     * Returns all friends of user.
+     *
+     * @param id the specified as identifier of user
+     * @return a List containing the friends as User Objects
+     * @see User
+     */
     @Override
     public List<User> allMyFriends(Long id) {
         final String sql = "select U.* from FRIENDS AS F " +
@@ -89,6 +142,18 @@ public class UserDbStorage implements UserStorage {
         return jdbcTemplate.query(sql, this::mapRowToUser, id);
     }
 
+    /**
+     * Return does the database contain the user by id
+     *
+     * @param userId the specified as identifier of the user
+     * @return does database contain the user by id
+     * @see Review
+     */
+    public Boolean containsIdUser(Long userId) {
+        final String sql = "SELECT user_id FROM users WHERE user_id = ?";
+        return jdbcTemplate.queryForList(sql, userId).size() > 0;
+    }
+    
     /**
      * @param id the specified ID of the user to be searched.
      * @returns a list of movies recommended for viewing, for the user
@@ -143,6 +208,14 @@ public class UserDbStorage implements UserStorage {
         return likes;
     }
 
+    /**
+     * Mapping a query result to User object
+     *
+     * @param rs the specified as identifier of ResultSet
+     * @param i  the specified as number of record from ResultSet
+     * @return user as User object with friends
+     * @see User
+     */
     private User mapRowToUser(ResultSet rs, int i) throws SQLException {
         ResultSetMetaData rsmd = rs.getMetaData();
         Set<Long> fr = new HashSet<>();

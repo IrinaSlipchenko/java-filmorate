@@ -67,7 +67,9 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> searchFilms(String text, EnumSet<SearchParam> searchParams) {return null;}
+    public List<Film> searchFilms(String text, EnumSet<SearchParam> searchParams) {
+        return null;
+    }
 
     @Override
     public List<Film> getSortedFilmsByDirector(Long directorId, SortParam sortBy) {

@@ -5,8 +5,12 @@ import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 public class InMemoryUserStorage implements UserStorage {
@@ -54,6 +58,9 @@ public class InMemoryUserStorage implements UserStorage {
     public List<User> allMyFriends(Long id) {
         return null;
     }
+
+    public Boolean containsIdUser(Long userId) {
+        return true;
 
     @Override
     public List<Film> recommendations(Long id) {
