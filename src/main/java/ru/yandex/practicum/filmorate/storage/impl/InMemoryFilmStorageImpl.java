@@ -1,14 +1,16 @@
-package ru.yandex.practicum.filmorate.storage.memory;
+package ru.yandex.practicum.filmorate.storage.impl;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.SearchParam;
+import ru.yandex.practicum.filmorate.model.SortParam;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.util.*;
 
 @Component
-public class InMemoryFilmStorage implements FilmStorage {
+public class InMemoryFilmStorageImpl implements FilmStorage {
 
     private final Map<Long, Film> films = new HashMap<>();
 
@@ -45,7 +47,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film delete(Long filmId) {
+    public Film deleteFilmById(Long filmId) {
         if (films.containsKey(filmId)) {
             Film film = films.get(filmId);
             films.remove(filmId);
@@ -55,7 +57,22 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getPopularFilms(int count) {
+    public List<Film> getPopularFilms(int count, Integer genreId, Integer year) {
+        return null;
+    }
+
+    @Override
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        return null;
+    }
+
+    @Override
+    public List<Film> searchFilms(String text, EnumSet<SearchParam> searchParams) {
+        return null;
+    }
+
+    @Override
+    public List<Film> getSortedFilmsByDirector(Long directorId, SortParam sortBy) {
         return null;
     }
 
