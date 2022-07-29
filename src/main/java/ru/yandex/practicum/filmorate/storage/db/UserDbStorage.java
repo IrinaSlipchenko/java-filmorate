@@ -105,11 +105,11 @@ public class UserDbStorage implements UserStorage {
         int maxIntersectionSize = 0;
         Long recommendUserId = null;
         for (Map.Entry<Long, Set<Long>> uid : likes.entrySet()) {
-            Set<Long> intersection = new HashSet<>(uid.getValue());
-            intersection.retainAll(targetSet);
-            if (intersection.equals(uid.getValue())) {
+            if (targetSet.equals(uid.getValue())) {
                 continue;
             }
+            Set<Long> intersection = new HashSet<>(uid.getValue());
+            intersection.retainAll(targetSet);
             if (intersection.size() > maxIntersectionSize) {
                 maxIntersectionSize = intersection.size();
                 recommendUserId = uid.getKey();
