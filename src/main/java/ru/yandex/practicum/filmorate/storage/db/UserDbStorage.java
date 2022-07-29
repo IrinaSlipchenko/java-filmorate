@@ -2,23 +2,25 @@ package ru.yandex.practicum.filmorate.storage.db;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Class is provides database functionalities for users.
@@ -36,6 +38,7 @@ public class UserDbStorage implements UserStorage {
      * @see FriendsStorage
      */
     private final FriendsStorage friendsStorage;
+    private final FilmStorage filmStorage;
 
     /**
      * Find and returns all users in the storage
@@ -149,6 +152,60 @@ public class UserDbStorage implements UserStorage {
     public Boolean containsIdUser(Long userId) {
         final String sql = "SELECT user_id FROM users WHERE user_id = ?";
         return jdbcTemplate.queryForList(sql, userId).size() > 0;
+    }
+    
+    /**
+     * @param id the specified ID of the user to be searched.
+     * @returns a list of movies recommended for viewing, for the user
+     */
+    @Override
+    public List<Film> recommendations(Long id) {
+        List<Film> result = new ArrayList<>();
+        Map<Long, Set<Long>> likes = getLikes();
+        if (!likes.containsKey(id) || likes.size() <= 1) {
+            return result;
+        }
+        Set<Long> targetSet = likes.get(id);
+        likes.remove(id);
+        int maxIntersectionSize = 0;
+        Long recommendUserId = null;
+        for (Map.Entry<Long, Set<Long>> uid : likes.entrySet()) {
+            if (targetSet.equals(uid.getValue())) {
+                continue;
+            }
+            Set<Long> intersection = new HashSet<>(uid.getValue());
+            intersection.retainAll(targetSet);
+            if (intersection.size() > maxIntersectionSize) {
+                maxIntersectionSize = intersection.size();
+                recommendUserId = uid.getKey();
+            }
+        }
+        if (recommendUserId != null) {
+            Set<Long> set = new HashSet<>(likes.get(recommendUserId));
+            set.removeAll(targetSet);
+            for (Long filmId : set) {
+                result.add(filmStorage.findFilmById(filmId));
+            }
+        }
+        return result;
+    }
+
+    /**
+     * @returns HashMap where the key is the user ID, the value is the movies that the user liked
+     */
+    private Map<Long, Set<Long>> getLikes() {
+        Map<Long, Set<Long>> likes = new HashMap<>();
+        jdbcTemplate.query("SELECT FILM_ID, USER_ID FROM FILM_LIKES",
+                (rs, rowNum) -> {
+                    Long userId = rs.getLong("USER_ID");
+                    Long filmId = rs.getLong("FILM_ID");
+                    if (!likes.containsKey(userId)) {
+                        likes.put(userId, new HashSet<>());
+                    }
+                    likes.get(userId).add(filmId);
+                    return null;
+                });
+        return likes;
     }
 
     /**
