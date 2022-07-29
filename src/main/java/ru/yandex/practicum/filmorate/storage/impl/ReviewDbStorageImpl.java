@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.db;
+package ru.yandex.practicum.filmorate.storage.impl;
 
 
 import lombok.RequiredArgsConstructor;
@@ -21,15 +21,15 @@ import java.util.List;
  */
 @Component
 @RequiredArgsConstructor
-public class ReviewDbStorage implements ReviewStorage {
+public class ReviewDbStorageImpl implements ReviewStorage {
     /**
      * @see JdbcTemplate
      */
     private final JdbcTemplate jdbcTemplate;
     /**
-     * @see ReviewLikeDbStorage
+     * @see ReviewLikeDbStorageImpl
      */
-    private final ReviewLikeDbStorage reviewLikeDbStorage;
+    private final ReviewLikeDbStorageImpl reviewLikeDbStorage;
 
 
     /**

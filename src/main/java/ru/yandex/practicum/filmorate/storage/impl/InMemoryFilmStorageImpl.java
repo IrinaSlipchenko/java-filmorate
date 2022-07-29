@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.memory;
+package ru.yandex.practicum.filmorate.storage.impl;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
@@ -10,7 +10,7 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import java.util.*;
 
 @Component
-public class InMemoryFilmStorage implements FilmStorage {
+public class InMemoryFilmStorageImpl implements FilmStorage {
 
     private final Map<Long, Film> films = new HashMap<>();
 

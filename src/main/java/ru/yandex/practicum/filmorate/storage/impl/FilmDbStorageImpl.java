@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.db;
+package ru.yandex.practicum.filmorate.storage.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
@@ -25,21 +25,21 @@ import java.util.stream.Collectors;
  * Class is provides database functionalities for films.
  *
  * @see JdbcTemplate
- * @see FilmGenreDbStorage
- * @see LikesDbStorage
- * @see DirectorDbStorage
+ * @see FilmGenreDbStorageImpl
+ * @see LikesDbStorageImpl
+ * @see DirectorDbStorageImpl
  */
 @Primary
 @Component
 @RequiredArgsConstructor
-public class FilmDbStorage implements FilmStorage {
+public class FilmDbStorageImpl implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
 
-    private final FilmGenreDbStorage fgStorage;
+    private final FilmGenreDbStorageImpl fgStorage;
 
-    private final LikesDbStorage likesStorage;
+    private final LikesDbStorageImpl likesStorage;
 
-    private final DirectorDbStorage directorDbStorage;
+    private final DirectorDbStorageImpl directorDbStorage;
 
     /**
      * Query will return all films from storage

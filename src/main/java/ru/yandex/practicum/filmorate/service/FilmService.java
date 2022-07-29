@@ -9,8 +9,8 @@ import ru.yandex.practicum.filmorate.model.SortParam;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
-import ru.yandex.practicum.filmorate.storage.db.FeedDbStorage;
-import ru.yandex.practicum.filmorate.storage.db.LikesDbStorage;
+import ru.yandex.practicum.filmorate.storage.impl.FeedDbStorageImpl;
+import ru.yandex.practicum.filmorate.storage.impl.LikesDbStorageImpl;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -25,8 +25,8 @@ import static ru.yandex.practicum.filmorate.model.feedEnum.OperationType.REMOVE;
  * @see FilmController
  * @see FilmStorage
  * @see UserStorage
- * @see FeedDbStorage
- * @see LikesDbStorage
+ * @see FeedDbStorageImpl
+ * @see LikesDbStorageImpl
  */
 
 @Service
@@ -34,8 +34,8 @@ import static ru.yandex.practicum.filmorate.model.feedEnum.OperationType.REMOVE;
 public class FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
-    private final FeedDbStorage feedDbStorage;
-    private final LikesDbStorage likesDbStorage;
+    private final FeedDbStorageImpl feedDbStorage;
+    private final LikesDbStorageImpl likesDbStorage;
 
     /**
      * Find all films in storage

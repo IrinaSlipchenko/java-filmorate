@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.db;
+package ru.yandex.practicum.filmorate.storage.impl;
 
 
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ import java.util.Set;
  */
 @Component
 @RequiredArgsConstructor
-public class LikesDbStorage {
+public class LikesDbStorageImpl {
 
     /**
      * @see JdbcTemplate
