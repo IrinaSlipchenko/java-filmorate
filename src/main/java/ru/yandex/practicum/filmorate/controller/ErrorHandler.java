@@ -110,4 +110,16 @@ public class ErrorHandler {
     public ErrorResponse handleAlreadyExistException(final AlreadyExistException e) {
         return new ErrorResponse(e.getMessage());
     }
+
+    /**
+     * @param e thrown GenreNotFoundException
+     * @return response status and data as ErrorResponse json with specified error
+     * @see GenreNotFoundException
+     * @see ErrorResponse
+     */
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleGenreNotFoundException(final GenreNotFoundException e) {
+        return new ErrorResponse(e.getMessage());
+    }
 }

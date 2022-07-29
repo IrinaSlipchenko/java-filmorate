@@ -2,19 +2,18 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
+import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.User;
-import static ru.yandex.practicum.filmorate.model.feedEnum.OperationType.*;
-
-
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.storage.db.FeedDbStorage;
 import ru.yandex.practicum.filmorate.storage.db.FriendsStorage;
 
-
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static ru.yandex.practicum.filmorate.model.feedEnum.OperationType.ADD;
+import static ru.yandex.practicum.filmorate.model.feedEnum.OperationType.REMOVE;
 
 /**
  * Class is provide business functionalities for users.
@@ -98,7 +97,7 @@ public class UserService {
     /**
      * User add friend. To feedStorage added an entity about event.
      *
-     * @param id the specified as identifier of user, which want to add a friend
+     * @param id       the specified as identifier of user, which want to add a friend
      * @param friendId the specified as identifier of user, which added to the friends of user
      * @return the user as User object from storage with identifier equals id
      * @see User
@@ -109,18 +108,17 @@ public class UserService {
         User user = userStorage.findUserById(id);
         userStorage.findUserById(friendId); // validate friend
         user.getFriends().add(friendId);
-        if(!friendsStorage.containsFriend(id,friendId)){
+        if (!friendsStorage.containsFriend(id, friendId)) {
             userStorage.update(user);
             feedDbStorage.addFriend(id, ADD, friendId);
-        }
-        else userStorage.update(user);
+        } else userStorage.update(user);
         return user;
     }
 
     /**
      * User delete friend. To feedStorage added an entity about event.
      *
-     * @param id the specified as identifier of user, which want to delete a friend
+     * @param id       the specified as identifier of user, which want to delete a friend
      * @param friendId the specified as identifier of user, which deleted from the friends of user
      * @return the user as User object from storage with identifier equals id
      * @see User,
@@ -156,7 +154,7 @@ public class UserService {
     /**
      * Returns a common friends of two users.
      *
-     * @param id the specified as identifier of first user
+     * @param id      the specified as identifier of first user
      * @param otherId the specified as identifier of second user
      * @return a List containing the common friends as User Objects
      * @see User
@@ -176,7 +174,7 @@ public class UserService {
      * @throws UserNotFoundException if the user not found in the storage by ID
      * @see Feed
      */
-    public List<Feed> feed(Long id){
+    public List<Feed> feed(Long id) {
         if (!userStorage.containsIdUser(id)) {
             throw new UserNotFoundException(id + " id - user not found");
         }

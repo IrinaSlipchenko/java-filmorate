@@ -21,6 +21,14 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Class is provides database functionalities for films.
+ *
+ * @see JdbcTemplate
+ * @see FilmGenreDbStorage
+ * @see LikesDbStorage
+ * @see DirectorDbStorage
+ */
 @Primary
 @Component
 @RequiredArgsConstructor
@@ -33,6 +41,12 @@ public class FilmDbStorage implements FilmStorage {
 
     private final DirectorDbStorage directorDbStorage;
 
+    /**
+     * Query will return all films from storage
+     *
+     * @return List of Film saved in storage at the current moment
+     * @see Film
+     */
     @Override
     public List<Film> findAll() {
         String sql = "SELECT F.*, R.MPA_NAME, R.MPA_DESCRIPTION FROM FILMS F\n" +
@@ -40,6 +54,13 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.query(sql, this::mapRowToFilm);
     }
 
+    /**
+     * Create film in the storage
+     *
+     * @param film the object we want to storage
+     * @return Film object specified with identifier and saved in storage
+     * @see Film
+     */
     @Override
     public Film create(Film film) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
@@ -58,6 +79,13 @@ public class FilmDbStorage implements FilmStorage {
         return film;
     }
 
+    /**
+     * Update film in the storage
+     *
+     * @param film the object we want to update in the storage
+     * @return Film object updated parameters in storage
+     * @see Film
+     */
     @Override
     public Film update(Film film) {
         findFilmById(film.getId());
@@ -73,6 +101,13 @@ public class FilmDbStorage implements FilmStorage {
         return film;
     }
 
+    /**
+     * Searches for a film by ID in storage
+     *
+     * @param filmId the identifier by which we want to find the movie in storage
+     * @return Film the film object saved in storage under specified identifier
+     * @see Film
+     */
     @Override
     public Film findFilmById(Long filmId) {
         String sql = "SELECT F.*, R.MPA_NAME, R.MPA_DESCRIPTION FROM FILMS F\n" +
@@ -85,6 +120,13 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
+    /**
+     * Removes a movie by ID from storage
+     *
+     * @param filmId the identifier by which we want to delete the movie in storage
+     * @return Film the film object delete in storage under specified identifier
+     * @see Film
+     */
     @Override
     public Film deleteFilmById(Long filmId) {
         Film film = findFilmById(filmId);
@@ -93,6 +135,15 @@ public class FilmDbStorage implements FilmStorage {
         return film;
     }
 
+    /**
+     * Returns movies sorted by number of likes
+     *
+     * @param count   count of movies
+     * @param genreId id genres
+     * @param year    release year
+     * @return List of Film
+     * @see Film
+     */
     @Override
     public List<Film> getPopularFilms(int count, Integer genreId, Integer year) {
         final String sql = "SELECT F.FILM_ID, count(USER_ID) LIKES\n" +
@@ -108,6 +159,14 @@ public class FilmDbStorage implements FilmStorage {
         return idList.stream().map(this::findFilmById).collect(Collectors.toList());
     }
 
+    /**
+     * Return common movies by two users
+     *
+     * @param userId   id first user
+     * @param friendId id second user
+     * @return List of Film
+     * @see Film
+     */
     @Override
     public List<Film> getCommonFilms(Long userId, Long friendId) {
         final String sql = "SELECT F.FILM_ID, count(USER_ID) LIKES\n" +
@@ -127,6 +186,15 @@ public class FilmDbStorage implements FilmStorage {
         return idList.stream().map(this::findFilmById).collect(Collectors.toList());
     }
 
+    /**
+     * Search for a movie by director or title
+     *
+     * @param text         keyword
+     * @param searchParams search parameters
+     * @return List of Film
+     * @see Film
+     * @see SearchParam
+     */
     @Override
     public List<Film> searchFilms(String text, EnumSet<SearchParam> searchParams) {
         final String sqlAllSearch = "SELECT F.*, R.MPA_NAME, R.MPA_DESCRIPTION FROM FILMS F\n" +
@@ -160,17 +228,32 @@ public class FilmDbStorage implements FilmStorage {
                 jdbcTemplate.query(sqlAllSearch, this::mapRowToFilm, text, text)
                 :
                 searchParams.contains(SearchParam.director)
-                ?
-                jdbcTemplate.query(sqlSearchByDirector, this::mapRowToFilm, text)
-                :
-                jdbcTemplate.query(sqlSearchByFilmTitle, this::mapRowToFilm, text);
+                        ?
+                        jdbcTemplate.query(sqlSearchByDirector, this::mapRowToFilm, text)
+                        :
+                        jdbcTemplate.query(sqlSearchByFilmTitle, this::mapRowToFilm, text);
     }
 
+    /**
+     * Validate film id
+     *
+     * @param filmId id of film
+     * @return true or false
+     */
     public Boolean containsIdFilm(Long filmId) {
         final String sql = "SELECT film_id FROM films WHERE film_id = ?";
         return jdbcTemplate.queryForList(sql, filmId).size() > 0;
     }
 
+    /**
+     * Mapping a query result to Film object
+     *
+     * @param rs the specified as identifier of ResultSet
+     * @param i  the specified as number of record from ResultSet
+     * @return Film object
+     * @see Film
+     * @see Mpa
+     */
     private Film mapRowToFilm(ResultSet rs, int i) throws SQLException {
         Mpa mpa = Mpa.builder()
                 .id(rs.getInt("rating_mpa_id"))
@@ -192,6 +275,15 @@ public class FilmDbStorage implements FilmStorage {
         return film;
     }
 
+    /**
+     * Find movies of given director, sorted by years or likes
+     *
+     * @param directorId the identifier of director
+     * @param sortBy     parameter of sorting
+     * @return List of Film
+     * @see Film
+     * @see SortParam
+     */
     @Override
     public List<Film> getSortedFilmsByDirector(Long directorId, SortParam sortBy) {
         directorDbStorage.findDirectorById(directorId);

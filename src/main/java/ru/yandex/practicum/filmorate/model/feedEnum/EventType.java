@@ -4,6 +4,7 @@ import ru.yandex.practicum.filmorate.model.Feed;
 
 /**
  * This class helps to define the event type to be recorded for user activity in feed.
+ *
  * @see Feed
  */
 public enum EventType {
