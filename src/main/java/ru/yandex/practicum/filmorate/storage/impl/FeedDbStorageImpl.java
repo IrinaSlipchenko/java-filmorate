@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.db;
+package ru.yandex.practicum.filmorate.storage.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -24,7 +24,7 @@ import static ru.yandex.practicum.filmorate.model.feedEnum.EventType.*;
  */
 @Component
 @RequiredArgsConstructor
-public class FeedDbStorage implements FeedStorage {
+public class FeedDbStorageImpl implements FeedStorage {
     /**
      * @see JdbcTemplate
      */

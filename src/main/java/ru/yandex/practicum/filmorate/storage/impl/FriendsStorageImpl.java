@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.db;
+package ru.yandex.practicum.filmorate.storage.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -12,7 +12,7 @@ import ru.yandex.practicum.filmorate.model.User;
  */
 @Component
 @RequiredArgsConstructor
-public class FriendsStorage {
+public class FriendsStorageImpl {
 
     private final JdbcTemplate jdbcTemplate;
 

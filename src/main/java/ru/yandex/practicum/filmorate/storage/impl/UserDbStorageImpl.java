@@ -1,18 +1,16 @@
-package ru.yandex.practicum.filmorate.storage.db;
+package ru.yandex.practicum.filmorate.storage.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
-import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -28,16 +26,16 @@ import java.util.*;
 @Component
 @Primary
 @RequiredArgsConstructor
-public class UserDbStorage implements UserStorage {
+public class UserDbStorageImpl implements UserStorage {
     /**
      * @see JdbcTemplate
      */
     private final JdbcTemplate jdbcTemplate;
 
     /**
-     * @see FriendsStorage
+     * @see FriendsStorageImpl
      */
-    private final FriendsStorage friendsStorage;
+    private final FriendsStorageImpl friendsStorage;
     private final FilmStorage filmStorage;
 
     /**

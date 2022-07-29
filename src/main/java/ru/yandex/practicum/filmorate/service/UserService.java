@@ -7,8 +7,8 @@ import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
-import ru.yandex.practicum.filmorate.storage.db.FeedDbStorage;
-import ru.yandex.practicum.filmorate.storage.db.FriendsStorage;
+import ru.yandex.practicum.filmorate.storage.impl.FeedDbStorageImpl;
+import ru.yandex.practicum.filmorate.storage.impl.FriendsStorageImpl;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,13 +27,13 @@ public class UserService {
      */
     private final UserStorage userStorage;
     /**
-     * @see FeedDbStorage
+     * @see FeedDbStorageImpl
      */
-    private final FeedDbStorage feedDbStorage;
+    private final FeedDbStorageImpl feedDbStorage;
     /**
-     * @see FriendsStorage
+     * @see FriendsStorageImpl
      */
-    private final FriendsStorage friendsStorage;
+    private final FriendsStorageImpl friendsStorage;
 
 
     /**
@@ -103,7 +103,7 @@ public class UserService {
      * @return the user as User object from storage with identifier equals id
      * @see User
      * @see UserStorage
-     * @see FeedDbStorage
+     * @see FeedDbStorageImpl
      */
     public User friendAdd(Long id, Long friendId) {
         User user = userStorage.findUserById(id);
@@ -124,7 +124,7 @@ public class UserService {
      * @return the user as User object from storage with identifier equals id
      * @see User,
      * @see UserStorage
-     * @see FeedDbStorage
+     * @see FeedDbStorageImpl
      */
     public User friendDelete(Long id, Long friendId) {
         User user = userStorage.findUserById(id);

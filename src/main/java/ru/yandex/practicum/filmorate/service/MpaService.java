@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.storage.db.MpaDBStorage;
+import ru.yandex.practicum.filmorate.storage.impl.MpaDBStorageImpl;
 
 import java.util.List;
 
@@ -11,13 +11,13 @@ import java.util.List;
  * This class helps lever MpaController translated user's request for Mpa objects to inner layer of storage,
  * preventing direct access of controllers to storage and adding some business logic if needed
  *
- * @see MpaDBStorage
+ * @see MpaDBStorageImpl
  */
 
 @Service
 @RequiredArgsConstructor
 public class MpaService {
-    private final MpaDBStorage mpaDBStorage;
+    private final MpaDBStorageImpl mpaDBStorage;
 
     /**
      * Find all Mpa in storage

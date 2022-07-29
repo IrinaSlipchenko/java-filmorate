@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.storage.db.GenreDbStorage;
+import ru.yandex.practicum.filmorate.storage.impl.GenreDbStorageImpl;
 
 import java.util.List;
 
@@ -11,12 +11,12 @@ import java.util.List;
  * This class helps lever GenreController translated user's request for Genre objects to inner layer of storage,
  * preventing direct access of controllers to storage and adding some business logic if needed
  *
- * @see GenreDbStorage
+ * @see GenreDbStorageImpl
  */
 @Service
 @RequiredArgsConstructor
 public class GenreService {
-    private final GenreDbStorage genreDbStorage;
+    private final GenreDbStorageImpl genreDbStorage;
 
     /**
      * Find all genres in storage

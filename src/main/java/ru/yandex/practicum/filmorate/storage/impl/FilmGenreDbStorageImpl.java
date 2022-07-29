@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.db;
+package ru.yandex.practicum.filmorate.storage.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -12,14 +12,14 @@ import java.util.TreeSet;
 /**
  * Class is provides database functionalities for films and genres.
  *
- * @see GenreDbStorage
+ * @see GenreDbStorageImpl
  * @see JdbcTemplate
  */
 @Component
 @RequiredArgsConstructor
-public class FilmGenreDbStorage {
+public class FilmGenreDbStorageImpl {
 
-    private final GenreDbStorage genreDbStorage;
+    private final GenreDbStorageImpl genreDbStorage;
     private final JdbcTemplate jdbcTemplate;
 
     /**

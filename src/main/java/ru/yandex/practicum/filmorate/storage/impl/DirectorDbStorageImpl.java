@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.db;
+package ru.yandex.practicum.filmorate.storage.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
@@ -25,7 +25,7 @@ import java.util.Set;
 @Primary
 @Component
 @RequiredArgsConstructor
-public class DirectorDbStorage implements DirectorStorage {
+public class DirectorDbStorageImpl implements DirectorStorage {
     private final JdbcTemplate jdbcTemplate;
 
     /**

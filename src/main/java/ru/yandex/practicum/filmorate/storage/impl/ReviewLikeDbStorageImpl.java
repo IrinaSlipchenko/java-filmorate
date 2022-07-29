@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.db;
+package ru.yandex.practicum.filmorate.storage.impl;
 
 
 import lombok.RequiredArgsConstructor;
@@ -12,7 +12,7 @@ import ru.yandex.practicum.filmorate.model.Review;
  */
 @Component
 @RequiredArgsConstructor
-public class ReviewLikeDbStorage {
+public class ReviewLikeDbStorageImpl {
     /**
      * @see JdbcTemplate
      */

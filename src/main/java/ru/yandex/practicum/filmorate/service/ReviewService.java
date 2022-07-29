@@ -6,7 +6,7 @@ import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.NoSuchIdException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
-import ru.yandex.practicum.filmorate.storage.db.*;
+import ru.yandex.practicum.filmorate.storage.impl.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,21 +20,21 @@ import static ru.yandex.practicum.filmorate.model.feedEnum.OperationType.*;
 @RequiredArgsConstructor
 public class ReviewService {
     /**
-     * @see ReviewDbStorage
+     * @see ReviewDbStorageImpl
      */
-    private final ReviewDbStorage reviewDbStorage;
+    private final ReviewDbStorageImpl reviewDbStorage;
     /**
-     * @see UserDbStorage
+     * @see UserDbStorageImpl
      */
-    private final UserDbStorage userDbStorage;
+    private final UserDbStorageImpl userDbStorage;
     /**
-     * @see FilmDbStorage
+     * @see FilmDbStorageImpl
      */
-    private final FilmDbStorage filmDbStorage;
+    private final FilmDbStorageImpl filmDbStorage;
     /**
-     * @see FeedDbStorage
+     * @see FeedDbStorageImpl
      */
-    private final FeedDbStorage feedDbStorage;
+    private final FeedDbStorageImpl feedDbStorage;
 
     /**
      * Add review to storage. To feedStorage added an entity about event.
@@ -44,8 +44,8 @@ public class ReviewService {
      * @throws UserNotFoundException if the user not found in the storage by ID
      * @throws FilmNotFoundException if the film not found in the storage by ID
      * @see Review
-     * @see FeedDbStorage
-     * @see ReviewDbStorage
+     * @see FeedDbStorageImpl
+     * @see ReviewDbStorageImpl
      */
     public Review add(Review review) {
         if (!userDbStorage.containsIdUser(review.getUserId())) {
@@ -67,8 +67,8 @@ public class ReviewService {
      * @return the review as Review object updated in the storage
      * @throws NoSuchIdException if the review not found in the storage by ID
      * @see Review
-     * @see FeedDbStorage
-     * @see ReviewDbStorage
+     * @see FeedDbStorageImpl
+     * @see ReviewDbStorageImpl
      */
     public Review update(Review review) {
         if (review.getReviewId() == null) return add(review);
@@ -104,8 +104,8 @@ public class ReviewService {
      * @return the review as Review object removed from storage with identifier equals reviewId
      * @throws NoSuchIdException if the review not found in the storage by ID
      * @see Review
-     * @see FeedDbStorage
-     * @see ReviewDbStorage
+     * @see FeedDbStorageImpl
+     * @see ReviewDbStorageImpl
      */
     public Review delete(Long reviewId) {
         if (!reviewDbStorage.containsIdReview(reviewId)) {
@@ -125,7 +125,7 @@ public class ReviewService {
      * @return a List containing the reviews
      * @throws FilmNotFoundException if the film not found in the storage by ID
      * @see Review
-     * @see ReviewDbStorage
+     * @see ReviewDbStorageImpl
      */
     public List<Review> getAll(Long filmId, Integer count) {
         if (filmId == null) return reviewDbStorage.getAll(count).stream()
@@ -149,8 +149,8 @@ public class ReviewService {
      * @return does like reaction add to review
      * @throws NoSuchIdException     if the review not found in the storage by ID
      * @throws UserNotFoundException if the user not found in the storage by ID
-     * @see ReviewLikeDbStorage
-     * @see ReviewDbStorage
+     * @see ReviewLikeDbStorageImpl
+     * @see ReviewDbStorageImpl
      */
     public Boolean addLike(Long id, Long userId) {
         if (!reviewDbStorage.containsIdReview(id)) {
@@ -170,7 +170,7 @@ public class ReviewService {
      * @return does dislike reaction add to review
      * @throws NoSuchIdException     if the review not found in the storage by ID
      * @throws UserNotFoundException if the user not found in the storage by ID
-     * @see ReviewDbStorage
+     * @see ReviewDbStorageImpl
      */
     public Boolean addDislike(Long id, Long userId) {
         if (!reviewDbStorage.containsIdReview(id)) {
@@ -191,7 +191,7 @@ public class ReviewService {
      * @return does reaction delete
      * @throws NoSuchIdException     if the review not found in the storage by ID
      * @throws UserNotFoundException if the user not found in the storage by ID
-     * @see ReviewDbStorage
+     * @see ReviewDbStorageImpl
      */
     public Boolean deleteReaction(Long id, Long userId, Boolean isUseful) {
         if (!reviewDbStorage.containsIdReview(id)) {
